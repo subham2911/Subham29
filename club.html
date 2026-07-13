@@ -239,6 +239,33 @@
     }
     .upi-any-btn:hover { transform: translateY(-2px); }
 
+    /* Confirm panel */
+    .confirm-panel {
+      margin-top: 20px; background: #f0fff4;
+      border: 2px solid #28a745; border-radius: 14px;
+      padding: 20px; text-align: left;
+      animation: slideDown .3s ease;
+    }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .confirm-panel h3 { font-size: 1rem; color: #155724; margin-bottom: 6px; }
+    .confirm-panel .cp-hint { font-size: .82rem; color: #666; margin-bottom: 14px; }
+    .member-found    { font-size: .84rem; color: #155724; background: #d4edda; padding: 6px 10px; border-radius: 6px; margin-bottom: 10px; }
+    .member-missing  { font-size: .84rem; color: #856404; background: #fff3cd; padding: 6px 10px; border-radius: 6px; margin-bottom: 10px; }
+
+    /* Pending approvals */
+    .pending-card { border-left: 4px solid #FF9933; }
+    .pending-badge {
+      display: inline-block; background: #FF9933; color: #fff;
+      font-size: .75rem; font-weight: 700; padding: 1px 8px;
+      border-radius: 20px; margin-left: 8px; vertical-align: middle;
+    }
+    .btn-sm-approve {
+      background: #28a745; color: #fff;
+      padding: 4px 10px; font-size: .78rem; border-radius: 6px;
+      border: none; cursor: pointer; margin-right: 4px;
+    }
+    .btn-sm-approve:hover { background: #218838; }
+
     @media (max-width: 560px) {
       header h1 { font-size: 1.2rem; }
       nav button { padding: 10px 11px; font-size: .8rem; }
@@ -316,16 +343,30 @@
       <div class="upi-tap-hint">Tap to open your UPI app directly</div>
 
       <div class="upi-apps-grid">
-        <a id="link-gpay"    class="upi-app-btn btn-gpay"    href="#"><span class="ai">🔵</span>Google Pay</a>
-        <a id="link-phonepe" class="upi-app-btn btn-phonepe" href="#"><span class="ai">🟣</span>PhonePe</a>
-        <a id="link-paytm"   class="upi-app-btn btn-paytm"   href="#"><span class="ai">🔷</span>Paytm</a>
-        <a id="link-bhim"    class="upi-app-btn btn-bhim"    href="#"><span class="ai">🇮🇳</span>BHIM</a>
+        <a id="link-gpay"    class="upi-app-btn btn-gpay"    href="#" onclick="onUpiClick('Google Pay')"><span class="ai">🔵</span>Google Pay</a>
+        <a id="link-phonepe" class="upi-app-btn btn-phonepe" href="#" onclick="onUpiClick('PhonePe')"><span class="ai">🟣</span>PhonePe</a>
+        <a id="link-paytm"   class="upi-app-btn btn-paytm"   href="#" onclick="onUpiClick('Paytm')"><span class="ai">🔷</span>Paytm</a>
+        <a id="link-bhim"    class="upi-app-btn btn-bhim"    href="#" onclick="onUpiClick('BHIM')"><span class="ai">🇮🇳</span>BHIM</a>
       </div>
 
-      <a id="link-any" class="upi-any-btn" href="#">&#128241; Open Any UPI App</a>
+      <a id="link-any" class="upi-any-btn" href="#" onclick="onUpiClick('UPI')">&#128241; Open Any UPI App</a>
 
-      <div class="pay-note">
-        After payment, please inform the admin to record your payment in the system.
+      <!-- Confirm panel — shown after tapping a UPI button -->
+      <div id="confirm-panel" class="confirm-panel" style="display:none">
+        <h3>&#10003; Confirm Your Payment</h3>
+        <p class="cp-hint">Paid via <strong id="confirm-app-name"></strong>? Submit below so admin can verify and record it.</p>
+        <div class="form-group">
+          <label>Your Mobile Number</label>
+          <input type="tel" id="confirm-mobile" maxlength="10" placeholder="10-digit mobile number"
+                 oninput="lookupConfirmMember()">
+        </div>
+        <div id="confirm-member-hint"></div>
+        <div class="form-group">
+          <label>Amount Paid (&#8377;)</label>
+          <input type="number" id="confirm-amount" placeholder="Enter amount" min="1">
+        </div>
+        <div id="confirm-result"></div>
+        <button id="btn-confirm" class="btn btn-primary" onclick="submitPending()" style="margin-top:4px">&#10003; I Have Paid — Submit for Approval</button>
       </div>
     </div>
   </div>
@@ -344,6 +385,10 @@
     </div>
 
     <div id="fee-panel" style="display:none">
+      <div class="card pending-card">
+        <h2>Pending Approvals <span id="pending-badge"></span> <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
+        <div id="pending-list"><div class="empty">No pending payments.</div></div>
+      </div>
       <div class="card">
         <h2>Record Fee Payment <button class="btn-logout" onclick="adminLogout()">Logout</button></h2>
         <div id="fee-alert" class="alert"></div>
@@ -546,7 +591,7 @@ async function refreshTab() {
 
 function refreshCurrentTab() {
   if (currentTab === 'members') renderMembers();
-  if (currentTab === 'fees' && adminLoggedIn) { populateMemberSelect(); renderPayments(); }
+  if (currentTab === 'fees' && adminLoggedIn) { renderPending(); populateMemberSelect(); renderPayments(); }
   if (currentTab === 'balance') renderBalance();
   if (currentTab === 'expenses' && adminLoggedIn) renderExpenses();
 }
@@ -695,7 +740,7 @@ function verifyAdmin(source) {
   document.getElementById('fee-gate').style.display  = 'none';
   document.getElementById('fee-panel').style.display = 'block';
 
-  if (source === 'fees') { populateMemberSelect(); renderPayments(); }
+  if (source === 'fees') { renderPending(); populateMemberSelect(); renderPayments(); }
   else { renderExpenses(); }
 }
 
@@ -828,6 +873,110 @@ function setLoading(btnId, on) {
   if (!btn) return;
   btn.disabled = on;
   btn.textContent = on ? 'Please wait...' : btn.dataset.label;
+}
+
+// ─── UPI Confirm Flow ────────────────────────────────────────────────────────
+function onUpiClick(appName) {
+  // Pre-fill the confirm panel and show it after app opens (800ms delay)
+  setTimeout(() => {
+    const panel = document.getElementById('confirm-panel');
+    document.getElementById('confirm-app-name').textContent = appName;
+    const amt = document.getElementById('pay-amount').value;
+    if (amt) document.getElementById('confirm-amount').value = amt;
+    document.getElementById('confirm-result').innerHTML = '';
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 900);
+}
+
+function lookupConfirmMember() {
+  const mobile = document.getElementById('confirm-mobile').value.trim();
+  const el = document.getElementById('confirm-member-hint');
+  if (mobile.length === 10) {
+    const m = toArr(CACHE.members).find(m => m.mobile === mobile);
+    el.innerHTML = m
+      ? '<div class="member-found">&#10003; Found: <strong>' + esc(m.name) + '</strong></div>'
+      : '<div class="member-missing">&#9888; Not registered — will be saved with mobile number only</div>';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+async function submitPending() {
+  const mobile = document.getElementById('confirm-mobile').value.trim();
+  const amount = parseFloat(document.getElementById('confirm-amount').value);
+  const app    = document.getElementById('confirm-app-name').textContent || 'UPI';
+
+  if (!/^\d{10}$/.test(mobile)) return alert2('confirm-result', 'error', 'Please enter a valid 10-digit mobile number.');
+  if (!amount || amount <= 0)   return alert2('confirm-result', 'error', 'Please enter the amount you paid.');
+
+  const member     = toArr(CACHE.members).find(m => m.mobile === mobile);
+  const memberName = member ? member.name : 'Unknown (' + mobile + ')';
+
+  document.getElementById('btn-confirm').disabled = true;
+  await mutate(data => {
+    if (!data.pending) data.pending = {};
+    data.pending[genId()] = { mobile, memberName, amount, app, date: fmtDate(new Date()), note: 'Paid via ' + app };
+  });
+  document.getElementById('btn-confirm').disabled = false;
+
+  // Replace confirm panel with success message
+  document.getElementById('confirm-panel').innerHTML =
+    '<div style="text-align:center; padding:10px">' +
+    '<div style="font-size:2rem">&#9989;</div>' +
+    '<div style="font-weight:700; color:#155724; margin:8px 0">Payment submitted for approval!</div>' +
+    '<div style="font-size:.85rem; color:#888">Admin will verify and approve shortly.</div></div>';
+}
+
+// ─── Pending Approvals (Admin) ────────────────────────────────────────────────
+function renderPending() {
+  const pending = toArr(CACHE.pending || {}).reverse();
+  const el      = document.getElementById('pending-list');
+  const badge   = document.getElementById('pending-badge');
+
+  badge.innerHTML = pending.length
+    ? '<span class="pending-badge">' + pending.length + '</span>' : '';
+
+  if (!pending.length) { el.innerHTML = '<div class="empty">No pending payments to approve.</div>'; return; }
+
+  let rows = '';
+  pending.forEach(p => {
+    rows += `<tr>
+      <td>${p.date}</td>
+      <td>${esc(p.memberName)}</td>
+      <td>${esc(p.mobile)}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(p.amount)}</span></td>
+      <td>${esc(p.app || 'UPI')}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-sm-approve" onclick="approvePending('${p._key}')">&#10003; Approve</button>
+        <button class="btn-sm-danger"  onclick="rejectPending('${p._key}')">&#10007; Reject</button>
+      </td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Name</th><th>Mobile</th><th>Amount</th><th>App</th><th>Action</th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+async function approvePending(key) {
+  await mutate(data => {
+    const p = (data.pending || {})[key];
+    if (!p) return;
+    const memberKey = Object.keys(data.members || {}).find(k => data.members[k].mobile === p.mobile) || null;
+    if (!data.payments) data.payments = {};
+    data.payments[genId()] = {
+      memberId: memberKey || '', memberName: p.memberName,
+      amount: p.amount, note: p.note, date: p.date
+    };
+    delete data.pending[key];
+  });
+}
+
+async function rejectPending(key) {
+  if (!confirm('Reject and delete this payment request?')) return;
+  await mutate(data => { delete data.pending[key]; });
 }
 
 // ─── UPI Pay Links ────────────────────────────────────────────────────────────

@@ -198,14 +198,46 @@
       margin-top: 18px; font-size: .82rem; color: #aaa;
       background: #fafafa; border-radius: 8px; padding: 10px 14px;
     }
-    .pay-apps {
-      display: flex; justify-content: center; gap: 10px;
-      flex-wrap: wrap; margin: 16px 0 0;
+    .pay-amount-wrap {
+      max-width: 210px; margin: 22px auto 4px;
     }
-    .pay-apps span {
-      background: #f0f0f0; border-radius: 20px;
-      padding: 4px 14px; font-size: .8rem; color: #555; font-weight: 600;
+    .pay-amount-wrap label {
+      font-size: .8rem; font-weight: 700; color: #777;
+      display: block; margin-bottom: 5px; text-align: left;
     }
+    .pay-amount-wrap input { text-align: center; font-size: 1rem; }
+    .upi-tap-hint {
+      font-size: .78rem; color: #bbb; margin: 10px 0 14px;
+    }
+    .upi-apps-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px; max-width: 360px; margin: 0 auto;
+    }
+    .upi-app-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; border-radius: 14px;
+      text-decoration: none; font-weight: 700;
+      font-size: .9rem; color: #fff;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      box-shadow: 0 3px 10px rgba(0,0,0,.18);
+    }
+    .upi-app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.22); }
+    .upi-app-btn:active { transform: scale(.97); opacity: .9; }
+    .upi-app-btn .ai   { font-size: 1.3rem; }
+    .btn-gpay    { background: linear-gradient(135deg, #4285F4, #1a56c4); }
+    .btn-phonepe { background: linear-gradient(135deg, #6739b7, #3d1a7e); }
+    .btn-paytm   { background: linear-gradient(135deg, #00b9f1, #0077c2); }
+    .btn-bhim    { background: linear-gradient(135deg, #f47920, #c45500); }
+    .upi-any-btn {
+      display: block; max-width: 360px; margin: 12px auto 0;
+      padding: 12px; border-radius: 14px; text-align: center;
+      background: linear-gradient(135deg, #8B0000, #c0392b);
+      color: #fff; font-weight: 700; font-size: .9rem;
+      text-decoration: none; box-shadow: 0 3px 10px rgba(0,0,0,.18);
+      transition: transform .15s;
+    }
+    .upi-any-btn:hover { transform: translateY(-2px); }
 
     @media (max-width: 560px) {
       header h1 { font-size: 1.2rem; }
@@ -217,7 +249,7 @@
 <body>
 
 <header>
-  <h1>&#127884; Shyama Prasad Smriti Sangha</h1>
+  <h1>🇮🇳 Shyama Prasad Smriti Sangha 🇮🇳</h1>
   <p>Club Management &amp; Fund Tracker</p>
 </header>
 
@@ -276,13 +308,21 @@
 
       <div><span class="upi-id">8981759157@jio</span></div>
 
-      <div class="pay-apps">
-        <span>&#128241; GPay</span>
-        <span>&#128241; PhonePe</span>
-        <span>&#128241; Paytm</span>
-        <span>&#128241; JioFinance</span>
-        <span>&#128241; Any UPI App</span>
+      <div class="pay-amount-wrap">
+        <label>Enter Amount (optional)</label>
+        <input type="number" id="pay-amount" placeholder="&#8377; e.g. 500" min="1" oninput="updatePayLinks()">
       </div>
+
+      <div class="upi-tap-hint">Tap to open your UPI app directly</div>
+
+      <div class="upi-apps-grid">
+        <a id="link-gpay"    class="upi-app-btn btn-gpay"    href="#"><span class="ai">🔵</span>Google Pay</a>
+        <a id="link-phonepe" class="upi-app-btn btn-phonepe" href="#"><span class="ai">🟣</span>PhonePe</a>
+        <a id="link-paytm"   class="upi-app-btn btn-paytm"   href="#"><span class="ai">🔷</span>Paytm</a>
+        <a id="link-bhim"    class="upi-app-btn btn-bhim"    href="#"><span class="ai">🇮🇳</span>BHIM</a>
+      </div>
+
+      <a id="link-any" class="upi-any-btn" href="#">&#128241; Open Any UPI App</a>
 
       <div class="pay-note">
         After payment, please inform the admin to record your payment in the system.
@@ -789,6 +829,19 @@ function setLoading(btnId, on) {
   btn.disabled = on;
   btn.textContent = on ? 'Please wait...' : btn.dataset.label;
 }
+
+// ─── UPI Pay Links ────────────────────────────────────────────────────────────
+function updatePayLinks() {
+  const amt  = document.getElementById('pay-amount').value;
+  const base = 'pa=8981759157@jio&pn=AMITABHA%20MOITRA&cu=INR';
+  const amtQ = amt ? '&am=' + encodeURIComponent(amt) : '';
+  document.getElementById('link-gpay').href    = 'tez://upi/pay?'  + base + amtQ;
+  document.getElementById('link-phonepe').href = 'phonepe://pay?'  + base + amtQ;
+  document.getElementById('link-paytm').href   = 'paytmmp://pay?'  + base + amtQ;
+  document.getElementById('link-bhim').href    = 'upi://pay?'      + base + amtQ;
+  document.getElementById('link-any').href     = 'upi://pay?'      + base + amtQ;
+}
+updatePayLinks();
 
 // ─── UPI QR Code ──────────────────────────────────────────────────────────────
 new QRCode(document.getElementById('upi-qr'), {

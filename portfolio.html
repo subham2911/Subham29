@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subham Halder — SDET Portfolio</title>
+  <style>
+    :root {
+      --bg: #0D1525;
+      --surface: #121F38;
+      --surface-raised: #18294A;
+      --border: #203050;
+      --text: #D8E8FF;
+      --text-sub: #7A9CC5;
+      --text-muted: #3D5878;
+      --accent: #F5A623;
+      --accent-bg: rgba(245,166,35,0.10);
+      --accent-border: rgba(245,166,35,0.28);
+      --teal: #34D9C3;
+      --green: #3DCC8E;
+      --mono: 'Cascadia Code','Consolas','Courier New',monospace;
+      --sans: 'Segoe UI',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #F2F6FF; --surface: #FFFFFF; --surface-raised: #E8EFFC;
+        --border: #C5D3E8; --text: #0D1525; --text-sub: #3A5470;
+        --text-muted: #7A98BE; --accent: #B8780A;
+        --accent-bg: rgba(184,120,10,0.08); --accent-border: rgba(184,120,10,0.25);
+        --teal: #0E8A78; --green: #1A8A5A;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0D1525; --surface: #121F38; --surface-raised: #18294A;
+      --border: #203050; --text: #D8E8FF; --text-sub: #7A9CC5;
+      --text-muted: #3D5878; --accent: #F5A623;
+      --accent-bg: rgba(245,166,35,0.10); --accent-border: rgba(245,166,35,0.28);
+      --teal: #34D9C3; --green: #3DCC8E;
+    }
+    :root[data-theme="light"] {
+      --bg: #F2F6FF; --surface: #FFFFFF; --surface-raised: #E8EFFC;
+      --border: #C5D3E8; --text: #0D1525; --text-sub: #3A5470;
+      --text-muted: #7A98BE; --accent: #B8780A;
+      --accent-bg: rgba(184,120,10,0.08); --accent-border: rgba(184,120,10,0.25);
+      --teal: #0E8A78; --green: #1A8A5A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(20px, 6vw, 100px);
+      gap: 28px;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-right: auto;
+    }
+    .nav-links { display: contents; }
+    .nav-links a {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text-sub);
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .theme-btn {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+    @media (max-width: 600px) { .nav-links { display: none; } }
+
+    /* LAYOUT */
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding-left: clamp(20px, 6vw, 100px);
+      padding-right: clamp(20px, 6vw, 100px);
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* HERO */
+    #hero {
+      padding-top: calc(54px + clamp(48px, 10vw, 96px));
+      padding-bottom: clamp(48px, 10vw, 96px);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-name {
+      font-size: clamp(3.4rem, 9vw, 7rem);
+      font-weight: 800;
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.3em;
+    }
+    .hero-name .given { color: var(--text); }
+    .hero-name .family { color: var(--accent); }
+    .hero-role {
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      color: var(--text-sub);
+      margin-bottom: 1.5rem;
+    }
+    .hero-bio {
+      max-width: 560px;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-sub);
+      margin-bottom: 2.5rem;
+    }
+    .contact-links { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 3rem; }
+    .contact-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 14px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .contact-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+      width: fit-content;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+    }
+    @media (max-width: 500px) { .stats { grid-template-columns: repeat(2, auto); } }
+    .stat {
+      padding: 18px 28px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-n {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-l {
+      font-size: 0.7rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* SECTIONS */
+    section { border-bottom: 1px solid var(--border); }
+    .section-inner {
+      padding-top: clamp(52px, 8vw, 80px);
+      padding-bottom: clamp(52px, 8vw, 80px);
+    }
+    .section-h {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+      margin-bottom: 2.5rem;
+      color: var(--text);
+    }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; }
+    .tl-item {
+      padding-left: 26px;
+      padding-bottom: 2.5rem;
+      border-left: 1px solid var(--border);
+      position: relative;
+    }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -4px; top: 5px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .tl-date {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .tl-co { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tl-role { font-size: 0.82rem; color: var(--teal); margin-bottom: 10px; }
+    .tl-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .tl-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .tl-list li {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-sub);
+      padding-left: 16px;
+      position: relative;
+    }
+    .tl-list li::before {
+      content: '›';
+      position: absolute; left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* TERMINAL SKILLS */
+    .terminal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .term-bar {
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .tdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .tdot-r { background: #FF5F57; }
+    .tdot-y { background: #FEBC2E; }
+    .tdot-g { background: #28C840; }
+    .term-title { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); margin-left: 8px; }
+    .term-body {
+      padding: 20px 24px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .t-cmt { color: var(--text-muted); }
+    .sk-row { display: flex; align-items: center; gap: 12px; }
+    .sk-name { color: var(--text); min-width: 200px; }
+    .sk-bar {
+      width: 130px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sk-fill { height: 100%; background: var(--accent); border-radius: 1px; }
+    .sk-pass { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--green); }
+    .t-gap { margin-top: 12px; }
+    .t-ok { color: var(--green); }
+
+    /* CERTS */
+    .certs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .cert-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .cert-ico { font-size: 1.3rem; margin-bottom: 8px; }
+    .cert-name { font-size: 0.86rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+
+    /* AWARDS */
+    .awards { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 2.5rem; }
+    .award {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      border-radius: 6px;
+      padding: 14px 20px;
+    }
+    .award-ico { font-size: 1.2rem; }
+    .award-title { font-size: 0.88rem; font-weight: 700; color: var(--accent); }
+    .award-org { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 620px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 26px;
+    }
+    .card-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .edu-degree { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .edu-inst { font-size: 0.86rem; color: var(--text-sub); margin-bottom: 8px; }
+    .edu-year { font-family: var(--mono); font-size: 0.74rem; color: var(--text-muted); }
+
+    .sport-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sport-row:last-of-type { border-bottom: none; }
+    .sport-em { font-size: 1.3rem; width: 28px; text-align: center; flex-shrink: 0; }
+    .sport-n { font-size: 0.9rem; color: var(--text); font-weight: 500; }
+    .sport-n span { font-size: 0.78rem; color: var(--text-muted); font-weight: 400; }
+    .vb-note {
+      margin-top: 16px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-bg);
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.65;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* FOOTER */
+    .footer-inner {
+      padding-top: 32px;
+      padding-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-name { font-weight: 600; font-size: 0.9rem; }
+    .footer-note { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">SH/</span>
+  <div class="nav-links">
+    <a href="#experience">Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#certifications">Certs</a>
+    <a href="#about">About</a>
+  </div>
+  <button class="theme-btn" id="themeBtn">&#9788; Light</button>
+</nav>
+
+<main>
+  <div id="hero">
+    <div class="wrap">
+      <p class="eyebrow">SDET &middot; Deloitte &middot; Kolkata, India</p>
+      <h1 class="hero-name">
+        <span class="given">Subham<br></span>
+        <span class="family">Halder</span>
+      </h1>
+      <p class="hero-role">Software Development Engineer in Test</p>
+      <p class="hero-bio">
+        3.6+ years delivering quality across e-commerce, healthcare, and insurance at Deloitte.
+        I automate what matters, lead offshore teams across APAC &amp; EMEA without missing
+        deadlines, and catch defects before they reach users.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:subhamhalder2911@gmail.com">&#9993; subhamhalder2911@gmail.com</a>
+        <a href="https://linkedin.com/in/subhamh2911" target="_blank" rel="noopener">&#8599; linkedin/subhamh2911</a>
+        <a href="tel:+918017639559">&#9990; +91-8017639559</a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-n">3.6+</div>
+          <div class="stat-l">Years</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">50+</div>
+          <div class="stat-l">Defects Caught</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">92%</div>
+          <div class="stat-l">PFI Reduction</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">5</div>
+          <div class="stat-l">Awards</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="experience">
+    <div class="wrap section-inner">
+      <p class="eyebrow">Experience</p>
+      <h2 class="section-h">Deloitte &mdash; Dec 2022 &ndash; Present</h2>
+      <div class="timeline">
+
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <p class="tl-date">Apr 2025 &ndash; Present &middot; Analyst (SDET I)</p>
+          <p class="tl-co">ARCH Insurance</p>
+          <p class="tl-role">Automation QA Engineer</p>
+          <span class="tl-tag">Insurance Domain</span>
+          <ul class="tl-list">
+            <li>Built 90+ UI automation cases using Deloitte's COFTA framework and 30+ Selenium Java scripts for Day 2 transactions, significantly cutting manual effort.</li>
+            <li>Automated end-to-end API scenarios using RestAssured Java &mdash; catching 50+ defects before they reached production.</li>
+            <li>Stepped up during critical go-live phases, including weekend support, to keep delivery on track without compromising quality.</li>
+          </ul>
+        </div>
+
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <p class="tl-date">Apr 2024 &ndash; Mar 2025 &middot; Associate Analyst (SDET)</p>
+          <p class="tl-co">Johnson &amp; Johnson</p>
+          <p class="tl-role">Offshore Test Lead &mdash; APAC &amp; EMEA</p>
+          <span class="tl-tag">Healthcare / ERP Domain</span>
+          <ul class="tl-list">
+            <li>Owned the complete testing lifecycle &mdash; BST, UAT, Pre-Prod, Production, and Sustainability &mdash; across five platforms, solo from IST, with zero missed deadlines.</li>
+            <li>Drove MBP Japan to a 100% replication success rate and slashed PFI defects by 92%+ through sharp issue detection and disciplined follow-through.</li>
+            <li>Set up 20+ custom Jira dashboards for real-time visibility, ran client kickoff sessions, and onboarded new team members through structured KT.</li>
+          </ul>
+        </div>
+
+        <div class="tl-item">
+          <span class="tl-dot"></span>
+          <p class="tl-date">Mar 2023 &ndash; Mar 2024 &middot; Associate Analyst (SDET)</p>
+          <p class="tl-co">Herbalife</p>
+          <p class="tl-role">Manual &amp; Automation QA Engineer</p>
+          <span class="tl-tag">E-Commerce Domain</span>
+          <ul class="tl-list">
+            <li>Validated MFA, PLP, and PDP flows integrated with HMS, Catalog Manager, and AEM &mdash; surfacing production-critical bugs before release.</li>
+            <li>Jumped in for weekend release support and ensured the team was never blocked during high-pressure deployment windows.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap section-inner">
+      <p class="eyebrow">Technical Skills</p>
+      <h2 class="section-h">Stack &amp; Expertise</h2>
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="tdot tdot-r"></div>
+          <div class="tdot tdot-y"></div>
+          <div class="tdot tdot-g"></div>
+          <span class="term-title">skills.test &mdash; running suite</span>
+        </div>
+        <div class="term-body">
+          <p class="t-cmt"># Languages &amp; Frameworks</p>
+          <div class="sk-row"><span class="sk-name">Java</span><div class="sk-bar"><div class="sk-fill" style="width:90%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Selenium WebDriver</span><div class="sk-bar"><div class="sk-fill" style="width:88%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">RestAssured</span><div class="sk-bar"><div class="sk-fill" style="width:86%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Cucumber (BDD)</span><div class="sk-bar"><div class="sk-fill" style="width:82%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Deloitte COFTA</span><div class="sk-bar"><div class="sk-fill" style="width:90%"></div></div><span class="sk-pass">PASS</span></div>
+
+          <p class="t-cmt t-gap"># Tools &amp; Platforms</p>
+          <div class="sk-row"><span class="sk-name">JIRA (Advanced)</span><div class="sk-bar"><div class="sk-fill" style="width:94%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Azure DevOps</span><div class="sk-bar"><div class="sk-fill" style="width:80%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Postman</span><div class="sk-bar"><div class="sk-fill" style="width:85%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">GitHub</span><div class="sk-bar"><div class="sk-fill" style="width:78%"></div></div><span class="sk-pass">PASS</span></div>
+
+          <p class="t-cmt t-gap"># Testing Expertise</p>
+          <div class="sk-row"><span class="sk-name">Manual Testing</span><div class="sk-bar"><div class="sk-fill" style="width:96%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Regression / Smoke</span><div class="sk-bar"><div class="sk-fill" style="width:92%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">API Testing</span><div class="sk-bar"><div class="sk-fill" style="width:87%"></div></div><span class="sk-pass">PASS</span></div>
+          <div class="sk-row"><span class="sk-name">Agile / Scrum</span><div class="sk-bar"><div class="sk-fill" style="width:90%"></div></div><span class="sk-pass">PASS</span></div>
+
+          <p class="t-ok t-gap">&#10003;  13 skills &mdash; all tests passed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certifications">
+    <div class="wrap section-inner">
+      <p class="eyebrow">Certifications</p>
+      <h2 class="section-h">Credentials &amp; Recognition</h2>
+      <div class="certs-grid">
+        <div class="cert-card">
+          <div class="cert-ico">&#128203;</div>
+          <p class="cert-name">ISTQB Foundation Level</p>
+        </div>
+        <div class="cert-card">
+          <div class="cert-ico">&#9881;&#65039;</div>
+          <p class="cert-name">TOSCA AS1, AS2 &amp; AE1</p>
+        </div>
+        <div class="cert-card">
+          <div class="cert-ico">&#129302;</div>
+          <p class="cert-name">Oracle AI Foundation</p>
+        </div>
+        <div class="cert-card">
+          <div class="cert-ico">&#129504;</div>
+          <p class="cert-name">Claude 101 &amp; Claude Code in Action</p>
+        </div>
+      </div>
+
+      <p class="eyebrow" style="margin-top:3rem;">Awards</p>
+      <div class="awards">
+        <div class="award">
+          <span class="award-ico">&#11088;</span>
+          <div>
+            <p class="award-title">Spot Award &times;2</p>
+            <p class="award-org">Deloitte</p>
+          </div>
+        </div>
+        <div class="award">
+          <span class="award-ico">&#127942;</span>
+          <div>
+            <p class="award-title">Applause Award &times;3</p>
+            <p class="award-org">Deloitte &mdash; Exceptional delivery &amp; project contributions</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap section-inner">
+      <p class="eyebrow">About</p>
+      <h2 class="section-h">Beyond the Test Suite</h2>
+      <div class="about-grid">
+        <div class="about-card">
+          <p class="card-label">Education</p>
+          <p class="edu-degree">Bachelor of Computer Applications</p>
+          <p class="edu-inst">BP Poddar Institute of Management and Technology</p>
+          <p class="edu-year">Kolkata, India &middot; 2019 &ndash; 2022</p>
+        </div>
+        <div class="about-card">
+          <p class="card-label">Sports</p>
+          <div class="sport-row">
+            <span class="sport-em">&#127952;</span>
+            <p class="sport-n">Volleyball <span>&mdash; primary sport</span></p>
+          </div>
+          <div class="sport-row">
+            <span class="sport-em">&#9917;</span>
+            <p class="sport-n">Other sports</p>
+          </div>
+          <div class="vb-note">
+            The same precision and team coordination I bring to a volleyball court, I bring to every QA sprint &mdash; reading the game, calling the play, keeping the team unblocked.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span class="footer-name">Subham Halder</span>
+    <span class="footer-note">SDET &middot; Kolkata &middot; subhamhalder2911@gmail.com</span>
+  </div>
+</footer>
+
+<script>
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+
+  function applyTheme(t) {
+    root.setAttribute('data-theme', t);
+    btn.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+  }
+
+  const saved = localStorage.getItem('sh-theme');
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  }
+
+  btn.addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem('sh-theme', next);
+  });
+</script>
+</body>
+</html>

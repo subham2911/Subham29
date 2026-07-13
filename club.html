@@ -42,10 +42,21 @@
       background: linear-gradient(155deg, #6b0d0d 0%, #9b1c1c 50%, #c0392b 100%);
       color: #fff;
       text-align: center;
-      padding: 30px 16px 22px;
+      padding: 24px 24px 20px;
       box-shadow: 0 4px 20px rgba(0,0,0,.28);
       position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 20px;
     }
+    .header-portrait {
+      flex-shrink: 0;
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      border: 3px solid var(--saffron);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.25), 0 4px 16px rgba(0,0,0,.4);
+      object-fit: cover; object-position: top center;
+      background: #5a1010;
+    }
+    .header-text { position: relative; }
     header::before {
       content: '';
       position: absolute; inset: 0;
@@ -410,6 +421,8 @@
     }
     @media (max-width: 560px) {
       header h1  { font-size: 1.2rem; }
+      .header-portrait { width: 54px; height: 54px; }
+      header { gap: 14px; }
       nav button { padding: 11px 10px; font-size: .74rem; }
       .card      { padding: 16px; }
       .stat-card .s-value { font-size: 1.6rem; }
@@ -419,9 +432,15 @@
 <body>
 
 <header>
-  <h1>🇮🇳 Shyama Prasad Smriti Sangha 🇮🇳</h1>
-  <p>Club Management &amp; Fund Tracker</p>
-  <p style="font-size:.75rem; opacity:.55; margin-top:6px;">Admin: Subham Halder</p>
+  <img class="header-portrait"
+       src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Dr._Syama_Prasad_Mookerjee.jpg"
+       alt="Shyama Prasad Mukherjee"
+       onerror="this.style.display='none'">
+  <div class="header-text">
+    <h1>🇮🇳 Shyama Prasad Smriti Sangha 🇮🇳</h1>
+    <p>Club Management &amp; Fund Tracker</p>
+    <p style="font-size:.75rem; opacity:.55; margin-top:6px;">Admin: Subham Halder</p>
+  </div>
 </header>
 
 <div id="sync-bar"></div>

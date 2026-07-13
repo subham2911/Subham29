@@ -325,6 +325,89 @@
     }
     footer strong { color: var(--red); }
 
+    /* ── Card hover lift ── */
+    .hover-lift { transition: transform .22s ease, box-shadow .22s ease; }
+    .hover-lift:hover { transform: translateY(-4px); box-shadow: var(--sh2); }
+
+    /* ── About / Founder ── */
+    .about-hero { background: linear-gradient(135deg, #fdf0e8 0%, #fff 60%); }
+    .about-hero p { font-size: .9rem; color: var(--text2); line-height: 1.8; margin-top: 8px; }
+    .draft-note {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--amber-bg); color: var(--amber);
+      font-size: .72rem; font-weight: 700; padding: 4px 12px;
+      border-radius: 20px; margin-bottom: 14px; letter-spacing: .3px;
+    }
+
+    .founder-layout {
+      display: flex; gap: 28px; align-items: flex-start;
+    }
+    .founder-img {
+      flex-shrink: 0; text-align: center;
+    }
+    .founder-img img {
+      width: 150px; height: 190px; object-fit: cover; object-position: top;
+      border-radius: 14px; border: 3px solid var(--saffron);
+      box-shadow: 0 6px 20px rgba(139,26,26,.18);
+      display: block;
+    }
+    .founder-img .img-caption {
+      font-size: .68rem; color: var(--text3); margin-top: 7px;
+      font-weight: 500; text-align: center;
+    }
+    .founder-bio h3 {
+      font-size: 1.25rem; font-weight: 800; color: var(--red);
+      margin-bottom: 2px;
+    }
+    .founder-bio .f-dates {
+      font-size: .78rem; color: var(--text3); font-weight: 600;
+      margin-bottom: 14px; letter-spacing: .3px;
+    }
+    .founder-bio p {
+      font-size: .86rem; color: var(--text2);
+      line-height: 1.8; margin-bottom: 10px;
+    }
+    .founder-bio .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0; }
+    .f-tag {
+      background: #fef3e8; border: 1px solid var(--saffron);
+      color: var(--red); font-size: .72rem; font-weight: 700;
+      padding: 3px 11px; border-radius: 20px; letter-spacing: .2px;
+    }
+
+    /* ── Social icons ── */
+    .social-grid {
+      display: flex; justify-content: center;
+      gap: 20px; flex-wrap: wrap; margin: 22px 0 10px;
+    }
+    .social-icon { position: relative; text-align: center; }
+    .social-icon a {
+      display: flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px; border-radius: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.15);
+      transition: transform .2s, box-shadow .2s; cursor: not-allowed;
+      opacity: .7;
+    }
+    .social-icon a:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(0,0,0,.2); opacity: .85; }
+    .social-icon svg { width: 27px; height: 27px; fill: #fff; }
+    .social-icon .sname { font-size: .68rem; color: var(--text3); font-weight: 600; margin-top: 6px; }
+    .cs-badge {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--saffron); color: #fff;
+      font-size: .55rem; font-weight: 700; padding: 2px 6px;
+      border-radius: 10px; white-space: nowrap; letter-spacing: .2px;
+    }
+    .si-fb { background: #1877F2; }
+    .si-ig { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .si-yt { background: #FF0000; }
+    .si-wa { background: #25D366; }
+    .si-tw { background: #000; }
+    .social-coming { font-size: .8rem; color: var(--text3); font-weight: 500; margin-top: 4px; text-align: center; }
+
+    @media (max-width: 620px) {
+      .founder-layout { flex-direction: column; align-items: center; text-align: center; }
+      .founder-bio .tag-row { justify-content: center; }
+      .founder-img img { width: 130px; height: 165px; }
+    }
     @media (max-width: 560px) {
       header h1  { font-size: 1.2rem; }
       nav button { padding: 11px 10px; font-size: .74rem; }
@@ -350,6 +433,7 @@
   <button onclick="showTab('fees',this)">Record Fees</button>
   <button onclick="showTab('expenses',this)">Expenses</button>
   <button onclick="showTab('balance',this)">Fund Balance</button>
+  <button onclick="showTab('about',this)">About</button>
 </nav>
 
 <div class="container">
@@ -531,22 +615,22 @@
   <!-- ===== BALANCE ===== -->
   <div id="tab-balance" class="section">
     <div class="stat-grid">
-      <div class="stat-card stat-members">
+      <div class="stat-card stat-members hover-lift">
         <div class="s-label">Total Members</div>
         <div class="s-value" id="stat-members">0</div>
         <div class="s-sub">registered</div>
       </div>
-      <div class="stat-card stat-income">
+      <div class="stat-card stat-income hover-lift">
         <div class="s-label">Fees Collected</div>
         <div class="s-value" id="stat-income">&#8377;0</div>
         <div class="s-sub" id="stat-income-count">0 payments</div>
       </div>
-      <div class="stat-card stat-expense">
+      <div class="stat-card stat-expense hover-lift">
         <div class="s-label">Total Expenses</div>
         <div class="s-value" id="stat-expense">&#8377;0</div>
         <div class="s-sub" id="stat-expense-count">0 entries</div>
       </div>
-      <div class="stat-card stat-balance">
+      <div class="stat-card stat-balance hover-lift">
         <div class="s-label">Current Balance</div>
         <div class="s-value" id="stat-balance">&#8377;0</div>
         <div class="s-sub">club fund</div>
@@ -556,6 +640,124 @@
       <h2>Transaction Ledger <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
       <div id="ledger"><div class="spinner-wrap"><div class="spinner"></div></div></div>
     </div>
+  </div>
+
+  <!-- ===== ABOUT ===== -->
+  <div id="tab-about" class="section">
+
+    <!-- Club intro -->
+    <div class="card about-hero hover-lift">
+      <h2>About Shyama Prasad Smriti Sangha</h2>
+      <span class="draft-note">&#9998; Draft — words not finalised yet</span>
+      <p>
+        Shyama Prasad Smriti Sangha is a community club founded in memory of the great patriot and
+        visionary leader Dr. Shyama Prasad Mukherjee. We are a group of dedicated individuals committed
+        to preserving his ideals of national unity, cultural pride, and service to the community.
+      </p>
+      <p style="margin-top:10px">
+        The club organises cultural programmes, community welfare activities, and annual commemorations
+        to honour Dr. Mukherjee's legacy and inspire future generations.
+      </p>
+    </div>
+
+    <!-- Founder / Namesake -->
+    <div class="card hover-lift">
+      <h2>Our Namesake — Dr. Shyama Prasad Mukherjee</h2>
+      <span class="draft-note">&#9998; Draft — words not finalised yet</span>
+      <div class="founder-layout">
+        <div class="founder-img">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Dr._Syama_Prasad_Mookerjee.jpg"
+               alt="Dr. Shyama Prasad Mukherjee"
+               onerror="this.src='https://via.placeholder.com/150x190?text=SP+Mukherjee'">
+          <div class="img-caption">Dr. Shyama Prasad Mukherjee<br>1901 – 1953</div>
+        </div>
+        <div class="founder-bio">
+          <h3>Dr. Shyama Prasad Mukherjee</h3>
+          <div class="f-dates">6 July 1901 &nbsp;–&nbsp; 23 June 1953</div>
+
+          <div class="tag-row">
+            <span class="f-tag">Barrister</span>
+            <span class="f-tag">Educationalist</span>
+            <span class="f-tag">Politician</span>
+            <span class="f-tag">Hindutva Activist</span>
+            <span class="f-tag">Union Minister</span>
+          </div>
+
+          <p>
+            Dr. Shyama Prasad Mukherjee was one of the most towering figures of post-independence India —
+            a barrister trained at Lincoln's Inn, London, who returned home to become Vice-Chancellor of
+            Calcutta University at just 33 years of age, the youngest in its history.
+          </p>
+          <p>
+            A passionate educationalist and a fierce nationalist, he rose to prominence as a powerful
+            voice for the cultural and political rights of Hindus in undivided Bengal. His founding of the
+            <strong>Bharatiya Jana Sangh</strong> laid the ideological groundwork for what would eventually become
+            the Bharatiya Janata Party (BJP).
+          </p>
+          <p>
+            Such was the respect he commanded across party lines that Prime Minister Jawaharlal Nehru —
+            despite Mukherjee's principled and unwavering opposition to the Congress — appointed him as the
+            first <strong>Minister of Industry and Supply</strong> in independent India's Union Cabinet.
+          </p>
+          <p>
+            His steadfast opposition to the special status granted to Jammu &amp; Kashmir led him to enter
+            the state in protest, where he was arrested. He passed away in custody in Srinagar on
+            23 June 1953, under circumstances that remain a subject of national debate to this day.
+          </p>
+          <p style="font-style:italic; color:var(--text3)">
+            "I will not allow India to be divided again — even if I have to sacrifice my life."
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Media -->
+    <div class="card hover-lift" style="text-align:center">
+      <h2>Connect With Us</h2>
+      <p style="font-size:.85rem; color:var(--text3); font-weight:500">
+        Our social media profiles are being set up — stay tuned!
+      </p>
+
+      <div class="social-grid">
+        <div class="social-icon">
+          <a href="#" onclick="return false" title="Facebook — Coming Soon" class="si-fb">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+          </a>
+          <span class="cs-badge">Soon</span>
+          <div class="sname">Facebook</div>
+        </div>
+        <div class="social-icon">
+          <a href="#" onclick="return false" title="Instagram — Coming Soon" class="si-ig">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <span class="cs-badge">Soon</span>
+          <div class="sname">Instagram</div>
+        </div>
+        <div class="social-icon">
+          <a href="#" onclick="return false" title="YouTube — Coming Soon" class="si-yt">
+            <svg viewBox="0 0 24 24"><path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+          </a>
+          <span class="cs-badge">Soon</span>
+          <div class="sname">YouTube</div>
+        </div>
+        <div class="social-icon">
+          <a href="#" onclick="return false" title="WhatsApp — Coming Soon" class="si-wa">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+          <span class="cs-badge">Soon</span>
+          <div class="sname">WhatsApp</div>
+        </div>
+        <div class="social-icon">
+          <a href="#" onclick="return false" title="X (Twitter) — Coming Soon" class="si-tw">
+            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <span class="cs-badge">Soon</span>
+          <div class="sname">X / Twitter</div>
+        </div>
+      </div>
+      <p class="social-coming">&#128222; Social media handles will be added once profiles are created.</p>
+    </div>
+
   </div>
 
 </div><!-- /container -->

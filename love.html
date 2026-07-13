@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I Love You, GunGun</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-hearts" aria-hidden="true">
+    <span>💖</span>
+    <span>💗</span>
+    <span>💕</span>
+    <span>💘</span>
+    <span>💞</span>
+  </div>
+
+  <main class="card">
+    <div class="ring-wrapper" aria-hidden="true">
+      <div class="ring"></div>
+    </div>
+
+    <div class="floating-heart">❤</div>
+    <p class="tag">For My Sweet GunGun</p>
+    <h1>I Love You, GunGun 💖</h1>
+    <p class="message">
+      Every moment with you feels like a beautiful dream. My heart belongs to you,
+      my smile finds peace in your love, and I want to spend forever making you feel
+      adored, safe, and deeply loved.
+    </p>
+
+    <div class="bouquet" aria-hidden="true">
+      <span class="flower red">🌹</span>
+      <span class="flower pink">🌷</span>
+      <span class="flower yellow">🌼</span>
+      <span class="flower purple">💐</span>
+    </div>
+
+    <div class="button-row">
+      <button id="yes-btn" class="love-btn big" data-message="Yes, forever with you, GunGun 💍">Yes, I will 💍</button>
+      <button id="song-btn" class="love-btn secondary">Play Tere Hawale</button>
+    </div>
+
+    <div id="song-player" class="song-player hidden">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/KUpwupYj_tY?rel=0&modestbranding=1"
+        title="Tere Hawale song"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <p id="proposal-text" class="proposal-text" aria-live="polite">Click the “Yes” button and let my heart say forever.</p>
+    <p class="signature">With all my love,<br />Always yours</p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

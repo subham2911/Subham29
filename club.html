@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shyama Prasad Smriti Sangha</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -163,6 +164,49 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Pay Now */
+    .pay-card {
+      text-align: center; padding: 28px 24px;
+    }
+    .pay-card .pay-title {
+      font-size: 1.1rem; font-weight: 700; color: #2c1810; margin-bottom: 4px;
+    }
+    .pay-card .pay-sub {
+      font-size: .85rem; color: #888; margin-bottom: 24px;
+    }
+    .qr-wrap {
+      display: inline-block;
+      padding: 16px; background: #fff;
+      border: 3px solid #FF9933;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+    .pay-name {
+      margin-top: 22px;
+      font-size: 1.15rem; font-weight: 800; color: #2c1810;
+    }
+    .pay-role {
+      font-size: .82rem; color: #888; margin-top: 3px;
+    }
+    .upi-id {
+      display: inline-block; margin-top: 14px;
+      background: #fff8f0; border: 1.5px solid #FF9933;
+      color: #8B0000; font-weight: 700; font-size: .95rem;
+      padding: 8px 20px; border-radius: 30px; letter-spacing: .3px;
+    }
+    .pay-note {
+      margin-top: 18px; font-size: .82rem; color: #aaa;
+      background: #fafafa; border-radius: 8px; padding: 10px 14px;
+    }
+    .pay-apps {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin: 16px 0 0;
+    }
+    .pay-apps span {
+      background: #f0f0f0; border-radius: 20px;
+      padding: 4px 14px; font-size: .8rem; color: #555; font-weight: 600;
+    }
+
     @media (max-width: 560px) {
       header h1 { font-size: 1.2rem; }
       nav button { padding: 10px 11px; font-size: .8rem; }
@@ -182,7 +226,8 @@
 <nav>
   <button class="active" onclick="showTab('register',this)">&#43; Register</button>
   <button onclick="showTab('members',this)">Members</button>
-  <button onclick="showTab('fees',this)">Pay Fees</button>
+  <button onclick="showTab('pay',this)">&#128373; Pay Now</button>
+  <button onclick="showTab('fees',this)">Record Fees</button>
   <button onclick="showTab('expenses',this)">Expenses</button>
   <button onclick="showTab('balance',this)">Fund Balance</button>
 </nav>
@@ -213,6 +258,35 @@
     <div class="card">
       <h2>Registered Members <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
       <div id="members-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ===== PAY NOW ===== -->
+  <div id="tab-pay" class="section">
+    <div class="card pay-card">
+      <div class="pay-title">Pay Membership Fee</div>
+      <div class="pay-sub">Scan the QR code with any UPI app</div>
+
+      <div class="qr-wrap">
+        <div id="upi-qr"></div>
+      </div>
+
+      <div class="pay-name">AMITABHA MOITRA (Vicky)</div>
+      <div class="pay-role">Cashier &mdash; Shyama Prasad Smriti Sangha</div>
+
+      <div><span class="upi-id">8981759157@jio</span></div>
+
+      <div class="pay-apps">
+        <span>&#128241; GPay</span>
+        <span>&#128241; PhonePe</span>
+        <span>&#128241; Paytm</span>
+        <span>&#128241; JioFinance</span>
+        <span>&#128241; Any UPI App</span>
+      </div>
+
+      <div class="pay-note">
+        After payment, please inform the admin to record your payment in the system.
+      </div>
     </div>
   </div>
 
@@ -715,6 +789,14 @@ function setLoading(btnId, on) {
   btn.disabled = on;
   btn.textContent = on ? 'Please wait...' : btn.dataset.label;
 }
+
+// ─── UPI QR Code ──────────────────────────────────────────────────────────────
+new QRCode(document.getElementById('upi-qr'), {
+  text: 'upi://pay?pa=8981759157@jio&pn=AMITABHA%20MOITRA&cu=INR',
+  width: 220, height: 220,
+  colorDark: '#000000', colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.H
+});
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.btn-primary[id]').forEach(btn => {

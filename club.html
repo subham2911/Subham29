@@ -478,6 +478,14 @@
 
   <!-- ===== MEMBERS ===== -->
   <div id="tab-members" class="section">
+    <!-- Admin-only: pending member approvals -->
+    <div id="pending-members-card" class="card" style="display:none; border-left:4px solid var(--saffron);">
+      <h2 style="display:flex;align-items:center;gap:10px;">
+        Pending Member Approvals
+        <span id="pm-badge" class="badge badge-amber" style="display:none;"></span>
+      </h2>
+      <div id="pending-members-list"></div>
+    </div>
     <div class="card">
       <h2>Registered Members <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
       <div id="members-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
@@ -793,7 +801,7 @@ const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
 const ADMIN_PASS = 'admin@spsangha';
 
 // ─── State ────────────────────────────────────────────────────────────────────
-let CACHE       = { members: {}, payments: {}, expenses: {} };
+let CACHE       = { members: {}, payments: {}, expenses: {}, pendingMembers: {} };
 let currentTab  = 'register';
 let adminLoggedIn = false;
 let busy        = false;
@@ -805,9 +813,10 @@ async function loadData() {
   });
   if (!res.ok) throw new Error('Load failed: ' + res.status);
   CACHE = await res.json();
-  if (!CACHE.members)  CACHE.members  = {};
-  if (!CACHE.payments) CACHE.payments = {};
-  if (!CACHE.expenses) CACHE.expenses = {};
+  if (!CACHE.members)        CACHE.members        = {};
+  if (!CACHE.payments)       CACHE.payments       = {};
+  if (!CACHE.expenses)       CACHE.expenses       = {};
+  if (!CACHE.pendingMembers) CACHE.pendingMembers = {};
 }
 
 async function saveData() {
@@ -860,7 +869,7 @@ function showTab(name, btn) {
   btn.classList.add('active');
   currentTab = name;
 
-  if (name === 'members') renderMembers();
+  if (name === 'members') { renderMembers(); renderPendingMembers(); }
   if (name === 'fees') {
     if (adminLoggedIn) {
       document.getElementById('fee-gate').style.display  = 'none';
@@ -888,7 +897,7 @@ async function refreshTab() {
 }
 
 function refreshCurrentTab() {
-  if (currentTab === 'members') renderMembers();
+  if (currentTab === 'members') { renderMembers(); renderPendingMembers(); }
   if (currentTab === 'fees' && adminLoggedIn) { renderPending(); populateMemberSelect(); renderPayments(); }
   if (currentTab === 'balance') renderBalance();
   if (currentTab === 'expenses' && adminLoggedIn) renderExpenses();
@@ -904,16 +913,21 @@ async function registerMember() {
 
   setLoading('btn-register', true);
   await mutate(data => {
-    if (Object.values(data.members).some(m => m.mobile === mobile)) {
-      alert2('reg-alert', 'error', 'A member with this mobile number already exists.');
+    if (!data.pendingMembers) data.pendingMembers = {};
+    const allMobiles = [
+      ...Object.values(data.members),
+      ...Object.values(data.pendingMembers)
+    ].map(m => m.mobile);
+    if (allMobiles.includes(mobile)) {
+      alert2('reg-alert', 'error', 'This mobile number is already registered or has a pending request.');
       throw new Error('duplicate');
     }
-    data.members[genId()] = { name, mobile, joined: fmtDate(new Date()) };
+    data.pendingMembers[genId()] = { name, mobile, requestedOn: fmtDate(new Date()) };
   }, 'reg-alert');
   setLoading('btn-register', false);
 
   if (!busy) {
-    alert2('reg-alert', 'success', name + ' has been registered successfully!');
+    alert2('reg-alert', 'success', '✅ Request submitted! Admin will review and approve your membership.');
     document.getElementById('reg-name').value   = '';
     document.getElementById('reg-mobile').value = '';
   }
@@ -930,13 +944,16 @@ function renderMembers() {
   let rows = '';
   members.forEach((m, i) => {
     const paid = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
+    const removeBtn = adminLoggedIn
+      ? `<button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button>`
+      : '';
     rows += `<tr>
       <td>${i + 1}</td>
       <td><strong>${esc(m.name)}</strong></td>
       <td>${esc(m.mobile)}</td>
       <td>${m.joined}</td>
       <td><span class="badge badge-green">&#8377;${fmt(paid)}</span></td>
-      <td><button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button></td>
+      <td>${removeBtn}</td>
     </tr>`;
   });
 
@@ -947,8 +964,63 @@ function renderMembers() {
 }
 
 async function deleteMember(key) {
+  if (!adminLoggedIn) return alert('Only admin can remove members.');
   if (!confirm('Remove this member? Their payment records will remain.')) return;
   await mutate(data => { delete data.members[key]; });
+}
+
+// ─── Pending Member Approvals (Admin) ─────────────────────────────────────────
+function renderPendingMembers() {
+  const card   = document.getElementById('pending-members-card');
+  const el     = document.getElementById('pending-members-list');
+  const badge  = document.getElementById('pm-badge');
+  if (!adminLoggedIn) { card.style.display = 'none'; return; }
+
+  const pending = toArr(CACHE.pendingMembers || {});
+  card.style.display = pending.length ? '' : 'none';
+
+  if (!pending.length) return;
+
+  badge.textContent  = pending.length;
+  badge.style.display = '';
+
+  let rows = '';
+  pending.forEach(m => {
+    rows += `<tr>
+      <td><strong>${esc(m.name)}</strong></td>
+      <td>${esc(m.mobile)}</td>
+      <td>${m.requestedOn}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-sm" style="background:var(--green);color:#fff;" onclick="approveMember('${m._key}')">&#10003; Approve</button>
+        <button class="btn-sm-danger" onclick="rejectMember('${m._key}')">&#10007; Reject</button>
+      </td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Name</th><th>Mobile</th><th>Requested On</th><th>Action</th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+async function approveMember(key) {
+  await mutate(data => {
+    if (!data.pendingMembers) return;
+    const m = data.pendingMembers[key];
+    if (!m) return;
+    data.members[key] = { name: m.name, mobile: m.mobile, joined: fmtDate(new Date()) };
+    delete data.pendingMembers[key];
+  });
+  renderPendingMembers();
+  renderMembers();
+}
+
+async function rejectMember(key) {
+  if (!confirm('Reject and delete this membership request?')) return;
+  await mutate(data => {
+    if (data.pendingMembers) delete data.pendingMembers[key];
+  });
+  renderPendingMembers();
 }
 
 // ─── Fees ─────────────────────────────────────────────────────────────────────
@@ -1040,6 +1112,7 @@ function verifyAdmin(source) {
 
   if (source === 'fees') { renderPending(); populateMemberSelect(); renderPayments(); }
   else { renderExpenses(); }
+  if (currentTab === 'members') { renderMembers(); renderPendingMembers(); }
 }
 
 function adminLogout() {

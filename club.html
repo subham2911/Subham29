@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shyama Prasad Smriti Sangha</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #fdf6ee;
+      color: #2c1810;
+      min-height: 100vh;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: linear-gradient(135deg, #8B0000 0%, #c0392b 100%);
+      color: #fff;
+      text-align: center;
+      padding: 24px 16px 18px;
+      box-shadow: 0 3px 12px rgba(0,0,0,.35);
+    }
+    header h1 { font-size: 1.75rem; letter-spacing: .5px; }
+    header p  { font-size: .85rem; opacity: .75; margin-top: 4px; }
+
+    /* ---- Nav ---- */
+    nav {
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      border-bottom: 2.5px solid #FF9933;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    }
+    nav button {
+      padding: 13px 18px;
+      border: none; background: none; cursor: pointer;
+      font-size: .88rem; font-weight: 600; color: #666;
+      border-bottom: 3px solid transparent;
+      transition: color .18s, background .18s;
+    }
+    nav button:hover { color: #8B0000; background: #fff5f0; }
+    nav button.active { color: #8B0000; border-bottom-color: #FF9933; }
+
+    /* ---- Layout ---- */
+    .container { max-width: 920px; margin: 0 auto; padding: 24px 14px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ---- Card ---- */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 24px;
+      box-shadow: 0 2px 14px rgba(0,0,0,.07);
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 1.05rem; color: #8B0000;
+      border-bottom: 2px solid #FF9933;
+      padding-bottom: 8px; margin-bottom: 16px;
+    }
+
+    /* ---- Form ---- */
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: .82rem; font-weight: 700; color: #555; margin-bottom: 5px; }
+    input, select {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid #ddd; border-radius: 8px;
+      font-size: .93rem; background: #fafafa;
+      transition: border-color .18s;
+    }
+    input:focus, select:focus { outline: none; border-color: #FF9933; background: #fff; }
+
+    /* ---- Buttons ---- */
+    .btn {
+      padding: 10px 22px; border: none; border-radius: 8px;
+      cursor: pointer; font-size: .92rem; font-weight: 700;
+      transition: background .18s, transform .12s;
+    }
+    .btn-primary { background: #8B0000; color: #fff; width: 100%; padding: 12px; }
+    .btn-primary:hover { background: #a00000; transform: translateY(-1px); }
+    .btn-sm-danger {
+      background: #dc3545; color: #fff;
+      padding: 4px 10px; font-size: .78rem; border-radius: 6px;
+      border: none; cursor: pointer;
+    }
+    .btn-sm-danger:hover { background: #c82333; }
+    .btn-logout {
+      float: right; margin-top: -3px;
+      background: #6c757d; color: #fff;
+      padding: 4px 12px; font-size: .8rem; border-radius: 6px;
+      border: none; cursor: pointer;
+    }
+    .btn-logout:hover { background: #5a6268; }
+
+    /* ---- Alerts ---- */
+    .alert {
+      padding: 10px 14px; border-radius: 8px;
+      margin-bottom: 14px; font-size: .88rem; display: none;
+    }
+    .alert-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+    .alert-error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+    /* ---- Table ---- */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th { background: #8B0000; color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f2ebe8; vertical-align: middle; }
+    tr:hover td { background: #fff9f5; }
+
+    /* ---- Badges ---- */
+    .badge {
+      display: inline-block; padding: 2px 9px;
+      border-radius: 20px; font-size: .8rem; font-weight: 700;
+    }
+    .badge-green  { background: #d4edda; color: #155724; }
+    .badge-red    { background: #f8d7da; color: #721c24; }
+    .badge-orange { background: #fff3cd; color: #856404; }
+
+    /* ---- Stat cards ---- */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 22px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 22px 18px;
+      text-align: center; box-shadow: 0 2px 14px rgba(0,0,0,.07);
+    }
+    .stat-card .s-label { font-size: .82rem; color: #888; }
+    .stat-card .s-value { font-size: 1.9rem; font-weight: 800; margin: 8px 0 4px; }
+    .stat-card .s-sub   { font-size: .8rem; color: #aaa; }
+    .stat-income  .s-value { color: #28a745; }
+    .stat-expense .s-value { color: #dc3545; }
+    .stat-balance .s-value { color: #8B0000; }
+    .stat-members .s-value { color: #0d6efd; }
+
+    /* ---- Admin gate ---- */
+    .admin-gate {
+      max-width: 360px; margin: 0 auto; text-align: center; padding: 10px 0;
+    }
+    .admin-gate p { color: #888; font-size: .87rem; margin-bottom: 16px; }
+    .admin-gate input { text-align: center; max-width: 260px; margin: 0 auto 12px; display: block; }
+    .admin-gate .btn-primary { max-width: 260px; margin: 0 auto; display: block; }
+    .admin-hint { margin-top: 12px; font-size: .78rem; color: #bbb; }
+
+    /* ---- Empty state ---- */
+    .empty { text-align: center; color: #bbb; padding: 30px 0; font-size: .9rem; }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 1.2rem; }
+      nav button { padding: 10px 11px; font-size: .8rem; }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>&#127884; Shyama Prasad Smriti Sangha</h1>
+  <p>Club Management &amp; Fund Tracker</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('register',this)">&#43; Register</button>
+  <button onclick="showTab('members',this)">Members</button>
+  <button onclick="showTab('fees',this)">Pay Fees</button>
+  <button onclick="showTab('expenses',this)">Expenses</button>
+  <button onclick="showTab('balance',this)">Fund Balance</button>
+</nav>
+
+<div class="container">
+
+  <!-- ===== REGISTER ===== -->
+  <div id="tab-register" class="section active">
+    <div class="card">
+      <h2>Register New Member</h2>
+      <div id="reg-alert" class="alert"></div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input id="reg-name" type="text" placeholder="Enter member's full name"
+               onkeydown="if(event.key==='Enter') registerMember()">
+      </div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input id="reg-mobile" type="tel" maxlength="10" placeholder="10-digit mobile number"
+               onkeydown="if(event.key==='Enter') registerMember()">
+      </div>
+      <button class="btn btn-primary" onclick="registerMember()">Register Member</button>
+    </div>
+  </div>
+
+  <!-- ===== MEMBERS ===== -->
+  <div id="tab-members" class="section">
+    <div class="card">
+      <h2>Registered Members</h2>
+      <div id="members-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== FEES ===== -->
+  <div id="tab-fees" class="section">
+
+    <div id="fee-gate" class="card">
+      <h2>Admin Login</h2>
+      <div class="admin-gate">
+        <p>Enter admin password to record payments</p>
+        <input id="fee-admin-pass" type="password" placeholder="Admin Password"
+               onkeydown="if(event.key==='Enter') verifyAdmin('fees')">
+        <button class="btn btn-primary" onclick="verifyAdmin('fees')">Login</button>
+      </div>
+    </div>
+
+    <div id="fee-panel" style="display:none">
+      <div class="card">
+        <h2>Record Fee Payment <button class="btn-logout" onclick="adminLogout()">Logout</button></h2>
+        <div id="fee-alert" class="alert"></div>
+        <div class="form-group">
+          <label>Select Member</label>
+          <select id="fee-member">
+            <option value="">-- Select Member --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (&#8377;)</label>
+          <input id="fee-amount" type="number" min="1" placeholder="Enter amount">
+        </div>
+        <div class="form-group">
+          <label>Note (optional)</label>
+          <input id="fee-note" type="text" placeholder="e.g. Annual membership 2025">
+        </div>
+        <button class="btn btn-primary" onclick="recordPayment()">Record Payment</button>
+      </div>
+      <div class="card">
+        <h2>Payment History</h2>
+        <div id="payments-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== EXPENSES ===== -->
+  <div id="tab-expenses" class="section">
+
+    <div id="admin-gate" class="card">
+      <h2>Admin Login</h2>
+      <div class="admin-gate">
+        <p>Enter admin password to manage expenses</p>
+        <input id="admin-pass" type="password" placeholder="Admin Password"
+               onkeydown="if(event.key==='Enter') verifyAdmin()">
+        <button class="btn btn-primary" onclick="verifyAdmin()">Login</button>
+      </div>
+    </div>
+
+    <div id="admin-panel" style="display:none">
+      <div class="card">
+        <h2>Add Expense <button class="btn-logout" onclick="adminLogout()">Logout</button></h2>
+        <div id="exp-alert" class="alert"></div>
+        <div class="form-group">
+          <label>Description</label>
+          <input id="exp-desc" type="text" placeholder="e.g. Puja decorations, Venue booking">
+        </div>
+        <div class="form-group">
+          <label>Amount (&#8377;)</label>
+          <input id="exp-amount" type="number" min="1" placeholder="Enter amount">
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input id="exp-date" type="date">
+        </div>
+        <button class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+      </div>
+      <div class="card">
+        <h2>Expense Records</h2>
+        <div id="expenses-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== BALANCE ===== -->
+  <div id="tab-balance" class="section">
+    <div class="stat-grid">
+      <div class="stat-card stat-members">
+        <div class="s-label">Total Members</div>
+        <div class="s-value" id="stat-members">0</div>
+        <div class="s-sub">registered</div>
+      </div>
+      <div class="stat-card stat-income">
+        <div class="s-label">Fees Collected</div>
+        <div class="s-value" id="stat-income">&#8377;0</div>
+        <div class="s-sub" id="stat-income-count">0 payments</div>
+      </div>
+      <div class="stat-card stat-expense">
+        <div class="s-label">Total Expenses</div>
+        <div class="s-value" id="stat-expense">&#8377;0</div>
+        <div class="s-sub" id="stat-expense-count">0 entries</div>
+      </div>
+      <div class="stat-card stat-balance">
+        <div class="s-label">Current Balance</div>
+        <div class="s-value" id="stat-balance">&#8377;0</div>
+        <div class="s-sub">club fund</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Transaction Ledger</h2>
+      <div id="ledger"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ─── Data layer (localStorage) ────────────────────────────────────────────────
+const NS = 'spsangha_';
+const DB = {
+  get members()  { return JSON.parse(localStorage.getItem(NS+'members')  || '[]'); },
+  get payments() { return JSON.parse(localStorage.getItem(NS+'payments') || '[]'); },
+  get expenses() { return JSON.parse(localStorage.getItem(NS+'expenses') || '[]'); },
+  save(key, val) { localStorage.setItem(NS + key, JSON.stringify(val)); }
+};
+
+const ADMIN_PASS = 'admin@spsangha';
+let adminLoggedIn = false;
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  if (name === 'members') renderMembers();
+  if (name === 'fees') {
+    if (adminLoggedIn) {
+      document.getElementById('fee-gate').style.display  = 'none';
+      document.getElementById('fee-panel').style.display = 'block';
+      populateMemberSelect();
+      renderPayments();
+    } else {
+      document.getElementById('fee-gate').style.display  = 'block';
+      document.getElementById('fee-panel').style.display = 'none';
+    }
+  }
+  if (name === 'balance') renderBalance();
+  if (name === 'expenses' && adminLoggedIn) renderExpenses();
+}
+
+// ─── Register ─────────────────────────────────────────────────────────────────
+function registerMember() {
+  const name   = document.getElementById('reg-name').value.trim();
+  const mobile = document.getElementById('reg-mobile').value.trim();
+
+  if (!name)                   return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
+  if (!/^\d{10}$/.test(mobile)) return alert2('reg-alert', 'error', 'Mobile number must be exactly 10 digits.');
+
+  const members = DB.members;
+  if (members.some(m => m.mobile === mobile))
+    return alert2('reg-alert', 'error', 'A member with this mobile number already exists.');
+
+  members.push({ id: Date.now(), name, mobile, joined: fmtDate(new Date()) });
+  DB.save('members', members);
+
+  alert2('reg-alert', 'success', name + ' has been registered successfully!');
+  document.getElementById('reg-name').value   = '';
+  document.getElementById('reg-mobile').value = '';
+}
+
+// ─── Members list ─────────────────────────────────────────────────────────────
+function renderMembers() {
+  const members  = DB.members;
+  const payments = DB.payments;
+  const el = document.getElementById('members-list');
+
+  if (!members.length) { el.innerHTML = '<div class="empty">No members registered yet.</div>'; return; }
+
+  let rows = '';
+  members.forEach((m, i) => {
+    const paid = payments.filter(p => p.memberId === m.id).reduce((s, p) => s + p.amount, 0);
+    rows += `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${esc(m.name)}</strong></td>
+      <td>${esc(m.mobile)}</td>
+      <td>${m.joined}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(paid)}</span></td>
+      <td><button class="btn-sm-danger" onclick="deleteMember(${m.id})">Remove</button></td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>#</th><th>Name</th><th>Mobile</th><th>Joined</th><th>Total Paid</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+function deleteMember(id) {
+  if (!confirm('Remove this member? Their payment records will remain.')) return;
+  DB.save('members', DB.members.filter(m => m.id !== id));
+  renderMembers();
+}
+
+// ─── Fees ─────────────────────────────────────────────────────────────────────
+function populateMemberSelect() {
+  const sel = document.getElementById('fee-member');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- Select Member --</option>';
+  DB.members.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.name + ' (' + m.mobile + ')';
+    if (String(m.id) === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function recordPayment() {
+  const memberId = parseInt(document.getElementById('fee-member').value);
+  const amount   = parseFloat(document.getElementById('fee-amount').value);
+  const note     = document.getElementById('fee-note').value.trim() || 'Membership fee';
+
+  if (!memberId)          return alert2('fee-alert', 'error', 'Please select a member.');
+  if (!amount || amount <= 0) return alert2('fee-alert', 'error', 'Please enter a valid amount.');
+
+  const member   = DB.members.find(m => m.id === memberId);
+  const payments = DB.payments;
+  payments.push({ id: Date.now(), memberId, memberName: member.name, amount, note, date: fmtDate(new Date()) });
+  DB.save('payments', payments);
+
+  alert2('fee-alert', 'success', '&#8377;' + fmt(amount) + ' payment recorded for ' + member.name + '.');
+  document.getElementById('fee-member').value = '';
+  document.getElementById('fee-amount').value = '';
+  document.getElementById('fee-note').value   = '';
+  renderPayments();
+}
+
+function renderPayments() {
+  const payments = [...DB.payments].reverse();
+  const el = document.getElementById('payments-list');
+  if (!payments.length) { el.innerHTML = '<div class="empty">No payments recorded yet.</div>'; return; }
+
+  let rows = '';
+  payments.forEach(p => {
+    rows += `<tr>
+      <td>${p.date}</td>
+      <td>${esc(p.memberName)}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(p.amount)}</span></td>
+      <td>${esc(p.note)}</td>
+      <td><button class="btn-sm-danger" onclick="deletePayment(${p.id})">Delete</button></td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Member</th><th>Amount</th><th>Note</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+function deletePayment(id) {
+  if (!confirm('Delete this payment record?')) return;
+  DB.save('payments', DB.payments.filter(p => p.id !== id));
+  renderPayments();
+}
+
+// ─── Admin / Expenses ─────────────────────────────────────────────────────────
+function verifyAdmin(source) {
+  const passId = source === 'fees' ? 'fee-admin-pass' : 'admin-pass';
+  const inp    = document.getElementById(passId);
+  if (inp.value !== ADMIN_PASS) {
+    inp.style.borderColor = '#dc3545';
+    inp.value = '';
+    setTimeout(() => { inp.style.borderColor = ''; }, 1600);
+    return;
+  }
+  adminLoggedIn = true;
+  inp.value = '';
+
+  // Unlock expenses tab
+  document.getElementById('admin-gate').style.display  = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  document.getElementById('exp-date').value = todayISO();
+
+  // Unlock fees tab
+  document.getElementById('fee-gate').style.display  = 'none';
+  document.getElementById('fee-panel').style.display = 'block';
+
+  if (source === 'fees') {
+    populateMemberSelect();
+    renderPayments();
+  } else {
+    renderExpenses();
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+
+  // Lock expenses tab
+  document.getElementById('admin-gate').style.display  = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
+
+  // Lock fees tab
+  document.getElementById('fee-gate').style.display  = 'block';
+  document.getElementById('fee-panel').style.display = 'none';
+  document.getElementById('fee-admin-pass').value = '';
+}
+
+function addExpense() {
+  const desc   = document.getElementById('exp-desc').value.trim();
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const date   = document.getElementById('exp-date').value;
+
+  if (!desc)              return alert2('exp-alert', 'error', 'Please enter a description.');
+  if (!amount || amount <= 0) return alert2('exp-alert', 'error', 'Please enter a valid amount.');
+  if (!date)              return alert2('exp-alert', 'error', 'Please select a date.');
+
+  const expenses = DB.expenses;
+  expenses.push({ id: Date.now(), desc, amount, date: fmtDate(new Date(date + 'T00:00:00')) });
+  DB.save('expenses', expenses);
+
+  alert2('exp-alert', 'success', 'Expense of &#8377;' + fmt(amount) + ' added.');
+  document.getElementById('exp-desc').value   = '';
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-date').value   = todayISO();
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const expenses = [...DB.expenses].reverse();
+  const el = document.getElementById('expenses-list');
+  if (!expenses.length) { el.innerHTML = '<div class="empty">No expenses recorded yet.</div>'; return; }
+
+  let rows = '';
+  expenses.forEach(e => {
+    rows += `<tr>
+      <td>${e.date}</td>
+      <td>${esc(e.desc)}</td>
+      <td><span class="badge badge-red">&#8377;${fmt(e.amount)}</span></td>
+      <td><button class="btn-sm-danger" onclick="deleteExpense(${e.id})">Delete</button></td>
+    </tr>`;
+  });
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Description</th><th>Amount</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+function deleteExpense(id) {
+  if (!confirm('Delete this expense record?')) return;
+  DB.save('expenses', DB.expenses.filter(e => e.id !== id));
+  renderExpenses();
+}
+
+// ─── Fund Balance ─────────────────────────────────────────────────────────────
+function renderBalance() {
+  const members  = DB.members;
+  const payments = DB.payments;
+  const expenses = DB.expenses;
+
+  const totalIncome  = payments.reduce((s, p) => s + p.amount, 0);
+  const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
+  const balance      = totalIncome - totalExpense;
+
+  document.getElementById('stat-members').textContent       = members.length;
+  document.getElementById('stat-income').innerHTML          = '&#8377;' + fmt(totalIncome);
+  document.getElementById('stat-expense').innerHTML         = '&#8377;' + fmt(totalExpense);
+  document.getElementById('stat-balance').innerHTML         = '&#8377;' + fmt(Math.abs(balance));
+  document.getElementById('stat-income-count').textContent  = payments.length + ' payment' + (payments.length !== 1 ? 's' : '');
+  document.getElementById('stat-expense-count').textContent = expenses.length + ' entr' + (expenses.length !== 1 ? 'ies' : 'y');
+
+  const balEl = document.getElementById('stat-balance');
+  balEl.style.color = balance >= 0 ? '#28a745' : '#dc3545';
+
+  // Ledger — merge and sort by date descending (most recent first)
+  const txns = [
+    ...payments.map(p => ({ ts: p.id, date: p.date, desc: 'Fee — ' + p.memberName + (p.note ? ' (' + p.note + ')' : ''), amount: p.amount, type: 'income' })),
+    ...expenses.map(e => ({ ts: e.id, date: e.date, desc: 'Expense — ' + e.desc, amount: e.amount, type: 'expense' }))
+  ].sort((a, b) => b.ts - a.ts);
+
+  const ledger = document.getElementById('ledger');
+  if (!txns.length) { ledger.innerHTML = '<div class="empty">No transactions yet.</div>'; return; }
+
+  let rows = '';
+  txns.forEach(tx => {
+    const sign  = tx.type === 'income' ? '+' : '−';
+    const badge = tx.type === 'income' ? 'badge-green' : 'badge-red';
+    rows += `<tr>
+      <td>${tx.date}</td>
+      <td>${esc(tx.desc)}</td>
+      <td><span class="badge ${badge}">${sign}&#8377;${fmt(tx.amount)}</span></td>
+    </tr>`;
+  });
+
+  ledger.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+function fmtDate(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return dd + '/' + mm + '/' + d.getFullYear();
+}
+
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmt(n) { return Number(n).toLocaleString('en-IN'); }
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function alert2(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'alert alert-' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// Init
+renderBalance();
+</script>
+</body>
+</html>

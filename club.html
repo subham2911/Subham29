@@ -14,7 +14,6 @@
       min-height: 100vh;
     }
 
-    /* ---- Header ---- */
     header {
       background: linear-gradient(135deg, #8B0000 0%, #c0392b 100%);
       color: #fff;
@@ -25,7 +24,17 @@
     header h1 { font-size: 1.75rem; letter-spacing: .5px; }
     header p  { font-size: .85rem; opacity: .75; margin-top: 4px; }
 
-    /* ---- Nav ---- */
+    /* sync indicator */
+    #sync-bar {
+      display: none;
+      background: #fff3cd; color: #856404;
+      text-align: center; font-size: .8rem;
+      padding: 5px; font-weight: 600;
+    }
+    #sync-bar.saving { background: #cce5ff; color: #004085; }
+    #sync-bar.error  { background: #f8d7da; color: #721c24; }
+    #sync-bar.show   { display: block; }
+
     nav {
       background: #fff;
       display: flex;
@@ -45,12 +54,10 @@
     nav button:hover { color: #8B0000; background: #fff5f0; }
     nav button.active { color: #8B0000; border-bottom-color: #FF9933; }
 
-    /* ---- Layout ---- */
     .container { max-width: 920px; margin: 0 auto; padding: 24px 14px; }
     .section { display: none; }
     .section.active { display: block; }
 
-    /* ---- Card ---- */
     .card {
       background: #fff;
       border-radius: 12px;
@@ -64,7 +71,6 @@
       padding-bottom: 8px; margin-bottom: 16px;
     }
 
-    /* ---- Form ---- */
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: .82rem; font-weight: 700; color: #555; margin-bottom: 5px; }
     input, select {
@@ -74,15 +80,16 @@
       transition: border-color .18s;
     }
     input:focus, select:focus { outline: none; border-color: #FF9933; background: #fff; }
+    input:disabled, select:disabled { opacity: .6; cursor: not-allowed; }
 
-    /* ---- Buttons ---- */
     .btn {
       padding: 10px 22px; border: none; border-radius: 8px;
       cursor: pointer; font-size: .92rem; font-weight: 700;
       transition: background .18s, transform .12s;
     }
     .btn-primary { background: #8B0000; color: #fff; width: 100%; padding: 12px; }
-    .btn-primary:hover { background: #a00000; transform: translateY(-1px); }
+    .btn-primary:hover:not(:disabled) { background: #a00000; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
     .btn-sm-danger {
       background: #dc3545; color: #fff;
       padding: 4px 10px; font-size: .78rem; border-radius: 6px;
@@ -96,8 +103,14 @@
       border: none; cursor: pointer;
     }
     .btn-logout:hover { background: #5a6268; }
+    .btn-refresh {
+      float: right; margin-top: -3px;
+      background: #FF9933; color: #fff;
+      padding: 4px 12px; font-size: .8rem; border-radius: 6px;
+      border: none; cursor: pointer;
+    }
+    .btn-refresh:hover { background: #e08020; }
 
-    /* ---- Alerts ---- */
     .alert {
       padding: 10px 14px; border-radius: 8px;
       margin-bottom: 14px; font-size: .88rem; display: none;
@@ -105,23 +118,19 @@
     .alert-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
     .alert-error   { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
 
-    /* ---- Table ---- */
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: .88rem; }
     th { background: #8B0000; color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; }
     td { padding: 8px 12px; border-bottom: 1px solid #f2ebe8; vertical-align: middle; }
     tr:hover td { background: #fff9f5; }
 
-    /* ---- Badges ---- */
     .badge {
       display: inline-block; padding: 2px 9px;
       border-radius: 20px; font-size: .8rem; font-weight: 700;
     }
     .badge-green  { background: #d4edda; color: #155724; }
     .badge-red    { background: #f8d7da; color: #721c24; }
-    .badge-orange { background: #fff3cd; color: #856404; }
 
-    /* ---- Stat cards ---- */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -139,17 +148,20 @@
     .stat-balance .s-value { color: #8B0000; }
     .stat-members .s-value { color: #0d6efd; }
 
-    /* ---- Admin gate ---- */
-    .admin-gate {
-      max-width: 360px; margin: 0 auto; text-align: center; padding: 10px 0;
-    }
+    .admin-gate { max-width: 360px; margin: 0 auto; text-align: center; padding: 10px 0; }
     .admin-gate p { color: #888; font-size: .87rem; margin-bottom: 16px; }
     .admin-gate input { text-align: center; max-width: 260px; margin: 0 auto 12px; display: block; }
     .admin-gate .btn-primary { max-width: 260px; margin: 0 auto; display: block; }
-    .admin-hint { margin-top: 12px; font-size: .78rem; color: #bbb; }
 
-    /* ---- Empty state ---- */
     .empty { text-align: center; color: #bbb; padding: 30px 0; font-size: .9rem; }
+
+    .spinner-wrap { text-align: center; padding: 30px; }
+    .spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid #f0ddd8; border-top-color: #8B0000;
+      border-radius: 50%; animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 560px) {
       header h1 { font-size: 1.2rem; }
@@ -164,6 +176,8 @@
   <h1>&#127884; Shyama Prasad Smriti Sangha</h1>
   <p>Club Management &amp; Fund Tracker</p>
 </header>
+
+<div id="sync-bar"></div>
 
 <nav>
   <button class="active" onclick="showTab('register',this)">&#43; Register</button>
@@ -190,15 +204,15 @@
         <input id="reg-mobile" type="tel" maxlength="10" placeholder="10-digit mobile number"
                onkeydown="if(event.key==='Enter') registerMember()">
       </div>
-      <button class="btn btn-primary" onclick="registerMember()">Register Member</button>
+      <button id="btn-register" class="btn btn-primary" onclick="registerMember()">Register Member</button>
     </div>
   </div>
 
   <!-- ===== MEMBERS ===== -->
   <div id="tab-members" class="section">
     <div class="card">
-      <h2>Registered Members</h2>
-      <div id="members-list"></div>
+      <h2>Registered Members <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
+      <div id="members-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
     </div>
   </div>
 
@@ -233,10 +247,10 @@
           <label>Note (optional)</label>
           <input id="fee-note" type="text" placeholder="e.g. Annual membership 2025">
         </div>
-        <button class="btn btn-primary" onclick="recordPayment()">Record Payment</button>
+        <button id="btn-pay" class="btn btn-primary" onclick="recordPayment()">Record Payment</button>
       </div>
       <div class="card">
-        <h2>Payment History</h2>
+        <h2>Payment History <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
         <div id="payments-list"></div>
       </div>
     </div>
@@ -251,8 +265,8 @@
       <div class="admin-gate">
         <p>Enter admin password to manage expenses</p>
         <input id="admin-pass" type="password" placeholder="Admin Password"
-               onkeydown="if(event.key==='Enter') verifyAdmin()">
-        <button class="btn btn-primary" onclick="verifyAdmin()">Login</button>
+               onkeydown="if(event.key==='Enter') verifyAdmin('expenses')">
+        <button class="btn btn-primary" onclick="verifyAdmin('expenses')">Login</button>
       </div>
     </div>
 
@@ -272,10 +286,10 @@
           <label>Date</label>
           <input id="exp-date" type="date">
         </div>
-        <button class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+        <button id="btn-expense" class="btn btn-primary" onclick="addExpense()">Add Expense</button>
       </div>
       <div class="card">
-        <h2>Expense Records</h2>
+        <h2>Expense Records <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
         <div id="expenses-list"></div>
       </div>
     </div>
@@ -307,25 +321,79 @@
       </div>
     </div>
     <div class="card">
-      <h2>Transaction Ledger</h2>
-      <div id="ledger"></div>
+      <h2>Transaction Ledger <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
+      <div id="ledger"><div class="spinner-wrap"><div class="spinner"></div></div></div>
     </div>
   </div>
 
-</div><!-- /container -->
+</div>
 
 <script>
-// ─── Data layer (localStorage) ────────────────────────────────────────────────
-const NS = 'spsangha_';
-const DB = {
-  get members()  { return JSON.parse(localStorage.getItem(NS+'members')  || '[]'); },
-  get payments() { return JSON.parse(localStorage.getItem(NS+'payments') || '[]'); },
-  get expenses() { return JSON.parse(localStorage.getItem(NS+'expenses') || '[]'); },
-  save(key, val) { localStorage.setItem(NS + key, JSON.stringify(val)); }
-};
-
+// ─── Config ───────────────────────────────────────────────────────────────────
+const BIN_ID  = '6a550358da38895dfe577e4b';
+const API_KEY = '$2a$10$tk3LJ39fSijtbeeqs/lV5uWtpviYGVdOpvRm2R9aerIzJ1rzulDaa';
+const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
 const ADMIN_PASS = 'admin@spsangha';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let CACHE       = { members: {}, payments: {}, expenses: {} };
+let currentTab  = 'register';
 let adminLoggedIn = false;
+let busy        = false;
+
+// ─── JSONBin helpers ──────────────────────────────────────────────────────────
+async function loadData() {
+  const res = await fetch(API_URL, {
+    headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
+  });
+  if (!res.ok) throw new Error('Load failed: ' + res.status);
+  CACHE = await res.json();
+  if (!CACHE.members)  CACHE.members  = {};
+  if (!CACHE.payments) CACHE.payments = {};
+  if (!CACHE.expenses) CACHE.expenses = {};
+}
+
+async function saveData() {
+  const res = await fetch(API_URL, {
+    method: 'PUT',
+    headers: {
+      'X-Master-Key': API_KEY,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(CACHE)
+  });
+  if (!res.ok) throw new Error('Save failed: ' + res.status);
+}
+
+// Fetch latest, apply mutation fn, save back
+async function mutate(fn, alertId) {
+  if (busy) return;
+  busy = true;
+  syncBar('saving', 'Saving...');
+  try {
+    await loadData();
+    fn(CACHE);
+    await saveData();
+    syncBar('', '');
+    refreshCurrentTab();
+  } catch (e) {
+    syncBar('error', 'Network error — please try again.');
+    if (alertId) alert2(alertId, 'error', 'Could not save. Check your connection.');
+  }
+  busy = false;
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ─── Sync bar ─────────────────────────────────────────────────────────────────
+function syncBar(type, msg) {
+  const bar = document.getElementById('sync-bar');
+  if (!msg) { bar.classList.remove('show', 'saving', 'error'); return; }
+  bar.className = 'show ' + type;
+  bar.textContent = msg;
+}
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 function showTab(name, btn) {
@@ -333,6 +401,7 @@ function showTab(name, btn) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+  currentTab = name;
 
   if (name === 'members') renderMembers();
   if (name === 'fees') {
@@ -350,44 +419,67 @@ function showTab(name, btn) {
   if (name === 'expenses' && adminLoggedIn) renderExpenses();
 }
 
+async function refreshTab() {
+  syncBar('saving', 'Loading latest data...');
+  try {
+    await loadData();
+    syncBar('', '');
+    refreshCurrentTab();
+  } catch(e) {
+    syncBar('error', 'Could not refresh — check your connection.');
+  }
+}
+
+function refreshCurrentTab() {
+  if (currentTab === 'members') renderMembers();
+  if (currentTab === 'fees' && adminLoggedIn) { populateMemberSelect(); renderPayments(); }
+  if (currentTab === 'balance') renderBalance();
+  if (currentTab === 'expenses' && adminLoggedIn) renderExpenses();
+}
+
 // ─── Register ─────────────────────────────────────────────────────────────────
-function registerMember() {
+async function registerMember() {
   const name   = document.getElementById('reg-name').value.trim();
   const mobile = document.getElementById('reg-mobile').value.trim();
 
-  if (!name)                   return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
+  if (!name)                    return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
   if (!/^\d{10}$/.test(mobile)) return alert2('reg-alert', 'error', 'Mobile number must be exactly 10 digits.');
 
-  const members = DB.members;
-  if (members.some(m => m.mobile === mobile))
-    return alert2('reg-alert', 'error', 'A member with this mobile number already exists.');
+  setLoading('btn-register', true);
+  await mutate(data => {
+    if (Object.values(data.members).some(m => m.mobile === mobile)) {
+      alert2('reg-alert', 'error', 'A member with this mobile number already exists.');
+      throw new Error('duplicate');
+    }
+    data.members[genId()] = { name, mobile, joined: fmtDate(new Date()) };
+  }, 'reg-alert');
+  setLoading('btn-register', false);
 
-  members.push({ id: Date.now(), name, mobile, joined: fmtDate(new Date()) });
-  DB.save('members', members);
-
-  alert2('reg-alert', 'success', name + ' has been registered successfully!');
-  document.getElementById('reg-name').value   = '';
-  document.getElementById('reg-mobile').value = '';
+  if (!busy) {
+    alert2('reg-alert', 'success', name + ' has been registered successfully!');
+    document.getElementById('reg-name').value   = '';
+    document.getElementById('reg-mobile').value = '';
+  }
 }
 
 // ─── Members list ─────────────────────────────────────────────────────────────
 function renderMembers() {
-  const members  = DB.members;
-  const payments = DB.payments;
+  const members  = toArr(CACHE.members);
+  const payments = toArr(CACHE.payments);
   const el = document.getElementById('members-list');
 
   if (!members.length) { el.innerHTML = '<div class="empty">No members registered yet.</div>'; return; }
 
   let rows = '';
   members.forEach((m, i) => {
-    const paid = payments.filter(p => p.memberId === m.id).reduce((s, p) => s + p.amount, 0);
+    const paid = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
     rows += `<tr>
       <td>${i + 1}</td>
       <td><strong>${esc(m.name)}</strong></td>
       <td>${esc(m.mobile)}</td>
       <td>${m.joined}</td>
       <td><span class="badge badge-green">&#8377;${fmt(paid)}</span></td>
-      <td><button class="btn-sm-danger" onclick="deleteMember(${m.id})">Remove</button></td>
+      <td><button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button></td>
     </tr>`;
   });
 
@@ -397,48 +489,53 @@ function renderMembers() {
   </table></div>`;
 }
 
-function deleteMember(id) {
+async function deleteMember(key) {
   if (!confirm('Remove this member? Their payment records will remain.')) return;
-  DB.save('members', DB.members.filter(m => m.id !== id));
-  renderMembers();
+  await mutate(data => { delete data.members[key]; });
 }
 
 // ─── Fees ─────────────────────────────────────────────────────────────────────
 function populateMemberSelect() {
+  const members = toArr(CACHE.members);
   const sel = document.getElementById('fee-member');
   const cur = sel.value;
   sel.innerHTML = '<option value="">-- Select Member --</option>';
-  DB.members.forEach(m => {
+  members.forEach(m => {
     const opt = document.createElement('option');
-    opt.value = m.id;
+    opt.value = m._key;
     opt.textContent = m.name + ' (' + m.mobile + ')';
-    if (String(m.id) === cur) opt.selected = true;
+    if (m._key === cur) opt.selected = true;
     sel.appendChild(opt);
   });
 }
 
-function recordPayment() {
-  const memberId = parseInt(document.getElementById('fee-member').value);
-  const amount   = parseFloat(document.getElementById('fee-amount').value);
-  const note     = document.getElementById('fee-note').value.trim() || 'Membership fee';
+async function recordPayment() {
+  const memberKey = document.getElementById('fee-member').value;
+  const amount    = parseFloat(document.getElementById('fee-amount').value);
+  const note      = document.getElementById('fee-note').value.trim() || 'Membership fee';
 
-  if (!memberId)          return alert2('fee-alert', 'error', 'Please select a member.');
+  if (!memberKey)             return alert2('fee-alert', 'error', 'Please select a member.');
   if (!amount || amount <= 0) return alert2('fee-alert', 'error', 'Please enter a valid amount.');
 
-  const member   = DB.members.find(m => m.id === memberId);
-  const payments = DB.payments;
-  payments.push({ id: Date.now(), memberId, memberName: member.name, amount, note, date: fmtDate(new Date()) });
-  DB.save('payments', payments);
+  const member = toArr(CACHE.members).find(m => m._key === memberKey);
 
-  alert2('fee-alert', 'success', '&#8377;' + fmt(amount) + ' payment recorded for ' + member.name + '.');
+  setLoading('btn-pay', true);
+  await mutate(data => {
+    data.payments[genId()] = {
+      memberId: memberKey, memberName: member.name,
+      amount, note, date: fmtDate(new Date())
+    };
+  }, 'fee-alert');
+  setLoading('btn-pay', false);
+
+  alert2('fee-alert', 'success', '&#8377;' + fmt(amount) + ' recorded for ' + member.name + '.');
   document.getElementById('fee-member').value = '';
   document.getElementById('fee-amount').value = '';
   document.getElementById('fee-note').value   = '';
-  renderPayments();
 }
 
 function renderPayments() {
-  const payments = [...DB.payments].reverse();
+  const payments = toArr(CACHE.payments).reverse();
   const el = document.getElementById('payments-list');
   if (!payments.length) { el.innerHTML = '<div class="empty">No payments recorded yet.</div>'; return; }
 
@@ -449,7 +546,7 @@ function renderPayments() {
       <td>${esc(p.memberName)}</td>
       <td><span class="badge badge-green">&#8377;${fmt(p.amount)}</span></td>
       <td>${esc(p.note)}</td>
-      <td><button class="btn-sm-danger" onclick="deletePayment(${p.id})">Delete</button></td>
+      <td><button class="btn-sm-danger" onclick="deletePayment('${p._key}')">Delete</button></td>
     </tr>`;
   });
 
@@ -459,10 +556,9 @@ function renderPayments() {
   </table></div>`;
 }
 
-function deletePayment(id) {
+async function deletePayment(key) {
   if (!confirm('Delete this payment record?')) return;
-  DB.save('payments', DB.payments.filter(p => p.id !== id));
-  renderPayments();
+  await mutate(data => { delete data.payments[key]; });
 }
 
 // ─── Admin / Expenses ─────────────────────────────────────────────────────────
@@ -478,59 +574,50 @@ function verifyAdmin(source) {
   adminLoggedIn = true;
   inp.value = '';
 
-  // Unlock expenses tab
   document.getElementById('admin-gate').style.display  = 'none';
   document.getElementById('admin-panel').style.display = 'block';
   document.getElementById('exp-date').value = todayISO();
 
-  // Unlock fees tab
   document.getElementById('fee-gate').style.display  = 'none';
   document.getElementById('fee-panel').style.display = 'block';
 
-  if (source === 'fees') {
-    populateMemberSelect();
-    renderPayments();
-  } else {
-    renderExpenses();
-  }
+  if (source === 'fees') { populateMemberSelect(); renderPayments(); }
+  else { renderExpenses(); }
 }
 
 function adminLogout() {
   adminLoggedIn = false;
-
-  // Lock expenses tab
   document.getElementById('admin-gate').style.display  = 'block';
   document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('admin-pass').value = '';
-
-  // Lock fees tab
-  document.getElementById('fee-gate').style.display  = 'block';
-  document.getElementById('fee-panel').style.display = 'none';
-  document.getElementById('fee-admin-pass').value = '';
+  document.getElementById('admin-pass').value          = '';
+  document.getElementById('fee-gate').style.display    = 'block';
+  document.getElementById('fee-panel').style.display   = 'none';
+  document.getElementById('fee-admin-pass').value      = '';
 }
 
-function addExpense() {
+async function addExpense() {
   const desc   = document.getElementById('exp-desc').value.trim();
   const amount = parseFloat(document.getElementById('exp-amount').value);
   const date   = document.getElementById('exp-date').value;
 
-  if (!desc)              return alert2('exp-alert', 'error', 'Please enter a description.');
+  if (!desc)               return alert2('exp-alert', 'error', 'Please enter a description.');
   if (!amount || amount <= 0) return alert2('exp-alert', 'error', 'Please enter a valid amount.');
-  if (!date)              return alert2('exp-alert', 'error', 'Please select a date.');
+  if (!date)               return alert2('exp-alert', 'error', 'Please select a date.');
 
-  const expenses = DB.expenses;
-  expenses.push({ id: Date.now(), desc, amount, date: fmtDate(new Date(date + 'T00:00:00')) });
-  DB.save('expenses', expenses);
+  setLoading('btn-expense', true);
+  await mutate(data => {
+    data.expenses[genId()] = { desc, amount, date: fmtDate(new Date(date + 'T00:00:00')) };
+  }, 'exp-alert');
+  setLoading('btn-expense', false);
 
   alert2('exp-alert', 'success', 'Expense of &#8377;' + fmt(amount) + ' added.');
   document.getElementById('exp-desc').value   = '';
   document.getElementById('exp-amount').value = '';
   document.getElementById('exp-date').value   = todayISO();
-  renderExpenses();
 }
 
 function renderExpenses() {
-  const expenses = [...DB.expenses].reverse();
+  const expenses = toArr(CACHE.expenses).reverse();
   const el = document.getElementById('expenses-list');
   if (!expenses.length) { el.innerHTML = '<div class="empty">No expenses recorded yet.</div>'; return; }
 
@@ -540,7 +627,7 @@ function renderExpenses() {
       <td>${e.date}</td>
       <td>${esc(e.desc)}</td>
       <td><span class="badge badge-red">&#8377;${fmt(e.amount)}</span></td>
-      <td><button class="btn-sm-danger" onclick="deleteExpense(${e.id})">Delete</button></td>
+      <td><button class="btn-sm-danger" onclick="deleteExpense('${e._key}')">Delete</button></td>
     </tr>`;
   });
 
@@ -550,17 +637,16 @@ function renderExpenses() {
   </table></div>`;
 }
 
-function deleteExpense(id) {
+async function deleteExpense(key) {
   if (!confirm('Delete this expense record?')) return;
-  DB.save('expenses', DB.expenses.filter(e => e.id !== id));
-  renderExpenses();
+  await mutate(data => { delete data.expenses[key]; });
 }
 
 // ─── Fund Balance ─────────────────────────────────────────────────────────────
 function renderBalance() {
-  const members  = DB.members;
-  const payments = DB.payments;
-  const expenses = DB.expenses;
+  const members  = toArr(CACHE.members);
+  const payments = toArr(CACHE.payments);
+  const expenses = toArr(CACHE.expenses);
 
   const totalIncome  = payments.reduce((s, p) => s + p.amount, 0);
   const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
@@ -572,15 +658,12 @@ function renderBalance() {
   document.getElementById('stat-balance').innerHTML         = '&#8377;' + fmt(Math.abs(balance));
   document.getElementById('stat-income-count').textContent  = payments.length + ' payment' + (payments.length !== 1 ? 's' : '');
   document.getElementById('stat-expense-count').textContent = expenses.length + ' entr' + (expenses.length !== 1 ? 'ies' : 'y');
+  document.getElementById('stat-balance').style.color       = balance >= 0 ? '#28a745' : '#dc3545';
 
-  const balEl = document.getElementById('stat-balance');
-  balEl.style.color = balance >= 0 ? '#28a745' : '#dc3545';
-
-  // Ledger — merge and sort by date descending (most recent first)
   const txns = [
-    ...payments.map(p => ({ ts: p.id, date: p.date, desc: 'Fee — ' + p.memberName + (p.note ? ' (' + p.note + ')' : ''), amount: p.amount, type: 'income' })),
-    ...expenses.map(e => ({ ts: e.id, date: e.date, desc: 'Expense — ' + e.desc, amount: e.amount, type: 'expense' }))
-  ].sort((a, b) => b.ts - a.ts);
+    ...payments.map(p => ({ _key: p._key, date: p.date, desc: 'Fee — ' + p.memberName + (p.note ? ' (' + p.note + ')' : ''), amount: p.amount, type: 'income' })),
+    ...expenses.map(e => ({ _key: e._key, date: e.date, desc: 'Expense — ' + e.desc, amount: e.amount, type: 'expense' }))
+  ].sort((a, b) => b._key < a._key ? -1 : 1);
 
   const ledger = document.getElementById('ledger');
   if (!txns.length) { ledger.innerHTML = '<div class="empty">No transactions yet.</div>'; return; }
@@ -603,23 +686,21 @@ function renderBalance() {
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-function fmtDate(d) {
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  return dd + '/' + mm + '/' + d.getFullYear();
+function toArr(obj) {
+  return Object.entries(obj || {}).map(([_key, val]) => ({ ...val, _key }));
 }
-
+function fmtDate(d) {
+  return String(d.getDate()).padStart(2,'0') + '/' +
+         String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+}
 function todayISO() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-
 function fmt(n) { return Number(n).toLocaleString('en-IN'); }
-
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function alert2(id, type, msg) {
   const el = document.getElementById(id);
   el.className = 'alert alert-' + type;
@@ -628,9 +709,33 @@ function alert2(id, type, msg) {
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = on;
+  btn.textContent = on ? 'Please wait...' : btn.dataset.label;
+}
 
-// Init
-renderBalance();
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.btn-primary[id]').forEach(btn => {
+  btn.dataset.label = btn.textContent;
+});
+
+(async () => {
+  syncBar('saving', 'Loading data...');
+  try {
+    await loadData();
+    syncBar('', '');
+  } catch(e) {
+    syncBar('error', 'Could not load data — check your connection and refresh.');
+  }
+  renderBalance();
+})();
+
+// Auto-refresh every 60 seconds so everyone sees latest data
+setInterval(async () => {
+  try { await loadData(); refreshCurrentTab(); } catch(e) {}
+}, 60000);
 </script>
 </body>
 </html>

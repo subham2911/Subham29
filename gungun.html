@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I Love You, GunGun 💖</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --ground: #fff0f6;
+      --ground-2: #fde4ef;
+      --text-primary: #2a0620;
+      --text-secondary: #8a3060;
+      --accent: #d4265e;
+      --accent-2: #7b35b2;
+      --card-bg: rgba(255, 255, 255, 0.90);
+      --card-border: rgba(212, 38, 94, 0.15);
+      --shadow-color: rgba(160, 40, 90, 0.18);
+      --flower-shadow: rgba(212, 38, 94, 0.25);
+      --tag-color: #aa3870;
+      --sig-color: #7a2555;
+      --proposal-color: #a01848;
+      --ring-color: rgba(212, 38, 94, 0.7);
+      --ring-glow: rgba(240, 100, 140, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ground: #07000d;
+        --ground-2: #120018;
+        --text-primary: #fce7ef;
+        --text-secondary: #e4a0c0;
+        --accent: #ff6b8a;
+        --accent-2: #c084fc;
+        --card-bg: rgba(22, 2, 16, 0.82);
+        --card-border: rgba(255, 107, 138, 0.18);
+        --shadow-color: rgba(255, 90, 140, 0.12);
+        --flower-shadow: rgba(255, 107, 138, 0.2);
+        --tag-color: #f0a0c5;
+        --sig-color: #e8b0d0;
+        --proposal-color: #ff8fb0;
+        --ring-color: rgba(255, 107, 138, 0.8);
+        --ring-glow: rgba(255, 107, 138, 0.25);
+      }
+    }
+
+    :root[data-theme="light"] {
+      --ground: #fff0f6; --ground-2: #fde4ef;
+      --text-primary: #2a0620; --text-secondary: #8a3060;
+      --accent: #d4265e; --accent-2: #7b35b2;
+      --card-bg: rgba(255,255,255,0.90); --card-border: rgba(212,38,94,0.15);
+      --shadow-color: rgba(160,40,90,0.18); --flower-shadow: rgba(212,38,94,0.25);
+      --tag-color: #aa3870; --sig-color: #7a2555; --proposal-color: #a01848;
+      --ring-color: rgba(212,38,94,0.7); --ring-glow: rgba(240,100,140,0.3);
+    }
+
+    :root[data-theme="dark"] {
+      --ground: #07000d; --ground-2: #120018;
+      --text-primary: #fce7ef; --text-secondary: #e4a0c0;
+      --accent: #ff6b8a; --accent-2: #c084fc;
+      --card-bg: rgba(22,2,16,0.82); --card-border: rgba(255,107,138,0.18);
+      --shadow-color: rgba(255,90,140,0.12); --flower-shadow: rgba(255,107,138,0.2);
+      --tag-color: #f0a0c5; --sig-color: #e8b0d0; --proposal-color: #ff8fb0;
+      --ring-color: rgba(255,107,138,0.8); --ring-glow: rgba(255,107,138,0.25);
+    }
+
+    html, body { margin: 0; padding: 0; min-height: 100vh; }
+
+    body {
+      background: radial-gradient(ellipse at 30% 20%, var(--ground-2) 0%, var(--ground) 70%);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    canvas#bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      z-index: 0;
+    }
+
+    .floating-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .fh {
+      position: absolute;
+      bottom: -10%;
+      font-size: 1.3rem;
+      animation: rise 12s linear infinite;
+      opacity: 0;
+    }
+
+    .fh:nth-child(1) { left: 7%;  animation-delay: 0s;   font-size: 1.1rem; }
+    .fh:nth-child(2) { left: 22%; animation-delay: 2.4s; font-size: 1.5rem; }
+    .fh:nth-child(3) { left: 44%; animation-delay: 5s;   font-size: 1rem; }
+    .fh:nth-child(4) { left: 66%; animation-delay: 1.2s; font-size: 1.4rem; }
+    .fh:nth-child(5) { left: 85%; animation-delay: 3.8s; font-size: 1.2rem; }
+    .fh:nth-child(6) { left: 36%; animation-delay: 7s;   font-size: 0.9rem; }
+
+    @keyframes rise {
+      0%   { transform: translateY(0) rotate(-5deg) scale(0.7); opacity: 0; }
+      10%  { opacity: 0.55; }
+      90%  { opacity: 0.35; }
+      100% { transform: translateY(-115vh) rotate(15deg) scale(1.15); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 580px);
+      padding: 44px 36px 40px;
+      border-radius: 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow:
+        0 4px 6px var(--shadow-color),
+        0 24px 60px var(--shadow-color),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .card.bloomed {
+      transform: scale(1.015);
+      box-shadow:
+        0 4px 6px var(--shadow-color),
+        0 32px 80px var(--flower-shadow),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .ring-wrap {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+    }
+
+    .ring {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 3px solid var(--ring-color);
+      box-shadow: 0 0 0 8px var(--ring-glow), 0 0 20px var(--ring-color);
+      opacity: 0.35;
+      transition: opacity 0.5s ease;
+    }
+
+    .ring.lit {
+      animation: pulse-ring 1.8s ease-in-out infinite;
+      opacity: 1;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 8px var(--ring-glow), 0 0 20px var(--ring-color); transform: scale(1); }
+      50%       { box-shadow: 0 0 0 14px var(--ring-glow), 0 0 32px var(--ring-color); transform: scale(1.07); }
+    }
+
+    .heart-icon {
+      font-size: 2.2rem;
+      display: inline-block;
+      animation: heartbeat 1.6s ease-in-out infinite;
+      margin-bottom: 4px;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14%      { transform: scale(1.22); }
+      28%      { transform: scale(1); }
+      42%      { transform: scale(1.14); }
+      70%      { transform: scale(1); }
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--tag-color);
+      font-weight: 600;
+      margin: 6px 0 0;
+    }
+
+    h1 {
+      font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin: 0.3em 0 0.6em;
+      color: var(--text-primary);
+      text-wrap: balance;
+      letter-spacing: -0.01em;
+    }
+
+    h1 em { color: var(--accent); font-style: italic; }
+
+    .message {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--text-secondary);
+      max-width: 440px;
+      margin: 0 auto 1.8rem;
+    }
+
+    .bouquet {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 12px;
+      font-size: 2rem;
+      margin: 0 0 28px;
+    }
+
+    .bouquet span {
+      display: inline-block;
+      animation: sway 2.6s ease-in-out infinite;
+      filter: drop-shadow(0 4px 6px var(--flower-shadow));
+    }
+
+    .bouquet span:nth-child(1) { animation-delay: 0s;     font-size: 1.8rem; }
+    .bouquet span:nth-child(2) { animation-delay: 0.35s;  font-size: 2.2rem; }
+    .bouquet span:nth-child(3) { animation-delay: 0.7s;   font-size: 1.8rem; }
+    .bouquet span:nth-child(4) { animation-delay: 1.05s;  font-size: 1.6rem; }
+
+    @keyframes sway {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50%       { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 13px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ff2060);
+      color: #fff;
+      box-shadow: 0 8px 24px var(--shadow-color);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--accent-2), #4a00a0);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(120, 50, 180, 0.25);
+    }
+
+    .btn:hover  { transform: translateY(-2px) scale(1.04); opacity: 0.93; }
+    .btn:active { transform: scale(0.98); }
+    .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+    .response-line {
+      min-height: 56px;
+      font-family: 'Palatino Linotype', Palatino, Georgia, serif;
+      font-size: 1.08rem;
+      font-style: italic;
+      font-weight: 600;
+      color: var(--proposal-color);
+      line-height: 1.5;
+      padding: 0 12px;
+      margin: 4px 0 20px;
+      transition: color 0.4s ease;
+    }
+
+    .signature {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--sig-color);
+      line-height: 1.7;
+      padding-top: 12px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    @media (max-width: 440px) {
+      .card { padding: 36px 22px 32px; }
+      .btn  { padding: 12px 18px; font-size: 0.9rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fh, .heart-icon, .bouquet span, .ring.lit { animation: none; }
+      .btn { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="floating-hearts" aria-hidden="true">
+  <span class="fh">💖</span>
+  <span class="fh">💗</span>
+  <span class="fh">💕</span>
+  <span class="fh">💞</span>
+  <span class="fh">❤️</span>
+  <span class="fh">💖</span>
+</div>
+
+<main class="card" id="card">
+  <div class="ring-wrap" aria-hidden="true">
+    <div class="ring" id="ring"></div>
+  </div>
+
+  <div class="heart-icon" aria-hidden="true">❤</div>
+  <p class="eyebrow">For My Sweet GunGun</p>
+  <h1>I Love You, <em>GunGun</em> 💖</h1>
+
+  <p class="message">
+    Every moment with you feels like a beautiful dream. My heart belongs to you,
+    my smile finds peace in your love, and I want to spend forever making you feel
+    adored, safe, and deeply loved.
+  </p>
+
+  <div class="bouquet" aria-hidden="true">
+    <span>🌹</span>
+    <span>🌷</span>
+    <span>🌼</span>
+    <span>💐</span>
+  </div>
+
+  <div class="btn-row">
+    <button id="yes-btn" class="btn btn-primary">Yes, I will 💍</button>
+    <a
+      href="https://www.youtube.com/watch?v=KUpwupYj_tY"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="btn btn-secondary"
+    >Play Tere Hawale ♪</a>
+  </div>
+
+  <p class="response-line" id="response" aria-live="polite">
+    Click "Yes" and let my heart say forever.
+  </p>
+
+  <p class="signature">With all my love,<br>Always yours ❤️</p>
+</main>
+
+<script>
+  /* Ambient heart on canvas */
+  (function () {
+    const canvas = document.getElementById('bg');
+    const ctx    = canvas.getContext('2d');
+    let W, H, phase = 0;
+
+    function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      phase += 0.008;
+      const r   = Math.min(W, H) * 0.38 * (1 + 0.04 * Math.sin(phase));
+      const cx  = W / 2, cy = H / 2;
+      const isDark = document.documentElement.dataset.theme === 'dark' ||
+        (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+      ctx.fillStyle = isDark ? '#ff6b8a' : '#d4265e';
+      ctx.beginPath();
+      for (let t = 0; t <= Math.PI * 2; t += 0.01) {
+        const x = cx + r * 16 * Math.pow(Math.sin(t), 3) / 16;
+        const y = cy - r * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16;
+        t === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* Yes button */
+  const yesBtn   = document.getElementById('yes-btn');
+  const response = document.getElementById('response');
+  const ring     = document.getElementById('ring');
+  const card     = document.getElementById('card');
+
+  yesBtn.addEventListener('click', () => {
+    response.textContent    = 'Yes, forever with you, GunGun 💍';
+    ring.classList.add('lit');
+    card.classList.add('bloomed');
+    yesBtn.textContent      = 'Forever yours 💍';
+    yesBtn.disabled         = true;
+    yesBtn.style.opacity    = '0.8';
+  });
+</script>
+</body>
+</html>

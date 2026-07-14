@@ -570,7 +570,8 @@
       <div class="form-group">
         <label>Full Name</label>
         <input id="reg-name" type="text" placeholder="Enter member's full name"
-               maxlength="25" onkeydown="if(event.key==='Enter') registerMember()">
+               maxlength="25" onkeydown="if(event.key==='Enter') registerMember()"
+               oninput="this.value=this.value.replace(/\b\w/g,c=>c.toUpperCase()).replace(/(?<=\S)\w/g,c=>c.toLowerCase())">
       </div>
       <div class="form-group">
         <label>Mobile Number</label>
@@ -1124,7 +1125,8 @@ function refreshCurrentTab() {
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 async function registerMember() {
-  const name   = document.getElementById('reg-name').value.trim();
+  const raw    = document.getElementById('reg-name').value.trim();
+  const name   = raw.replace(/\b\w/g, c => c.toUpperCase()).replace(/(?<=\S)\w/g, c => c.toLowerCase());
   const mobile = document.getElementById('reg-mobile').value.trim();
 
   if (!name)                            return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');

@@ -1397,10 +1397,10 @@ document.querySelectorAll('.btn-primary[id]').forEach(btn => {
   renderBalance();
 })();
 
-// Auto-refresh every 60 seconds so everyone sees latest data
+// Auto-refresh every 5 minutes to conserve JSONBin free-tier quota
 setInterval(async () => {
   try { await loadData(); refreshCurrentTab(); } catch(e) {}
-}, 60000);
+}, 300000);
 </script>
 </body>
 </html>

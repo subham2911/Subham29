@@ -570,7 +570,7 @@
       <div class="form-group">
         <label>Full Name</label>
         <input id="reg-name" type="text" placeholder="Enter member's full name"
-               maxlength="60" onkeydown="if(event.key==='Enter') registerMember()">
+               maxlength="25" onkeydown="if(event.key==='Enter') registerMember()">
       </div>
       <div class="form-group">
         <label>Mobile Number</label>
@@ -1128,8 +1128,8 @@ async function registerMember() {
   const mobile = document.getElementById('reg-mobile').value.trim();
 
   if (!name)                            return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
-  if (name.length > 60)                 return alert2('reg-alert', 'error', 'Name must be 60 characters or fewer.');
-  if (!/^[a-zA-Z\s\.\-']+$/.test(name)) return alert2('reg-alert', 'error', 'Name should contain letters only.');
+  if (name.length > 25)                  return alert2('reg-alert', 'error', 'Name must be 25 characters or fewer.');
+  if (!/^[a-zA-Z\s]+$/.test(name))      return alert2('reg-alert', 'error', 'Name must contain letters and spaces only — no special characters.');
   if (!/^\d{10}$/.test(mobile))         return alert2('reg-alert', 'error', 'Mobile number must be exactly 10 digits.');
 
   setLoading('btn-register', true);

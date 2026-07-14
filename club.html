@@ -340,6 +340,43 @@
     .hover-lift { transition: transform .22s ease, box-shadow .22s ease; }
     .hover-lift:hover { transform: translateY(-4px); box-shadow: var(--sh2); }
 
+    /* ── Role badges ── */
+    .role-badge {
+      display:inline-block; padding:2px 9px; border-radius:20px;
+      font-size:.72rem; font-weight:700; white-space:nowrap;
+    }
+    .role-select {
+      border:1px solid var(--border); border-radius:6px;
+      padding:3px 6px; font-family:inherit; font-size:.78rem;
+      background:#fff; cursor:pointer;
+    }
+
+    /* ── Committee grid ── */
+    .committee-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap:16px; margin-top:16px;
+    }
+    .committee-card {
+      text-align:center; padding:18px 12px; border-radius:14px;
+      border:1px solid var(--border); background:var(--bg);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .committee-card:hover { transform:translateY(-3px); box-shadow:var(--sh2); }
+    .committee-avatar {
+      width:52px; height:52px; border-radius:50%;
+      background:linear-gradient(135deg,var(--red),var(--saffron));
+      color:#fff; font-size:1.4rem; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 10px;
+    }
+    .committee-name { font-weight:700; font-size:.88rem; color:var(--text); margin-bottom:6px; }
+    .committee-role-pill {
+      display:inline-block; padding:3px 10px; border-radius:20px;
+      font-size:.7rem; font-weight:700; margin-bottom:6px;
+    }
+    .committee-mobile { font-size:.75rem; color:var(--text3); }
+
     /* ── AI Chat ── */
     .ai-msg { display:flex; }
     .ai-msg-user { justify-content: flex-end; }
@@ -757,6 +794,12 @@
       </p>
     </div>
 
+    <!-- Club Committee -->
+    <div class="card hover-lift">
+      <h2>&#127942; Club Committee</h2>
+      <div id="committee-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+
     <!-- Founder / Namesake -->
     <div class="card hover-lift">
       <h2>Our Namesake — Dr. Shyama Prasad Mukherjee</h2>
@@ -1023,6 +1066,7 @@ function showTab(name, btn) {
   currentTab = name;
 
   if (name === 'members') { renderMembers(); renderPendingMembers(); }
+  if (name === 'about')   { renderCommittee(); }
   if (name === 'fees') {
     if (adminLoggedIn) {
       document.getElementById('fee-gate').style.display  = 'none';
@@ -1054,6 +1098,7 @@ function refreshCurrentTab() {
   if (currentTab === 'fees' && adminLoggedIn) { renderPending(); populateMemberSelect(); renderPayments(); }
   if (currentTab === 'balance') renderBalance();
   if (currentTab === 'expenses' && adminLoggedIn) renderExpenses();
+  if (currentTab === 'about') renderCommittee();
 }
 
 // ─── Register ─────────────────────────────────────────────────────────────────
@@ -1086,6 +1131,21 @@ async function registerMember() {
   }
 }
 
+// ─── Role config ──────────────────────────────────────────────────────────────
+const ROLES = [
+  { value: 'President',        color: '#7f1d1d', bg: '#fee2e2' },
+  { value: 'Vice President',   color: '#9a3412', bg: '#ffedd5' },
+  { value: 'Secretary',        color: '#1e3a5f', bg: '#dbeafe' },
+  { value: 'Joint Secretary',  color: '#164e63', bg: '#e0f7fa' },
+  { value: 'Treasurer',        color: '#14532d', bg: '#dcfce7' },
+  { value: 'Committee Member', color: '#581c87', bg: '#f3e8ff' },
+  { value: 'Member',           color: '#374151', bg: '#f3f4f6' },
+];
+const ROLE_PRIORITY = ROLES.map(r => r.value);
+function roleInfo(role) {
+  return ROLES.find(r => r.value === role) || ROLES[ROLES.length - 1];
+}
+
 // ─── Members list ─────────────────────────────────────────────────────────────
 function renderMembers() {
   const members  = toArr(CACHE.members);
@@ -1094,15 +1154,31 @@ function renderMembers() {
 
   if (!members.length) { el.innerHTML = '<div class="empty">No members registered yet.</div>'; return; }
 
+  // Sort: post-holders first by priority, then alphabetically
+  members.sort((a, b) => {
+    const ai = ROLE_PRIORITY.indexOf(a.role || 'Member');
+    const bi = ROLE_PRIORITY.indexOf(b.role || 'Member');
+    if (ai !== bi) return ai - bi;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
   let rows = '';
   members.forEach((m, i) => {
-    const paid = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
+    const paid    = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
+    const role    = m.role || 'Member';
+    const ri      = roleInfo(role);
+    const roleCell = adminLoggedIn
+      ? `<select class="role-select" onchange="setMemberRole('${m._key}',this.value)">
+           ${ROLES.map(r => `<option value="${r.value}"${role===r.value?' selected':''}>${r.value}</option>`).join('')}
+         </select>`
+      : `<span class="role-badge" style="background:${ri.bg};color:${ri.color}">${role}</span>`;
     const removeBtn = adminLoggedIn
       ? `<button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button>`
       : '';
     rows += `<tr>
       <td>${i + 1}</td>
       <td><strong>${esc(m.name)}</strong></td>
+      <td>${roleCell}</td>
       <td>${esc(m.mobile)}</td>
       <td>${m.joined}</td>
       <td><span class="badge badge-green">&#8377;${fmt(paid)}</span></td>
@@ -1111,15 +1187,52 @@ function renderMembers() {
   });
 
   el.innerHTML = `<div class="table-wrap"><table>
-    <tr><th>#</th><th>Name</th><th>Mobile</th><th>Joined</th><th>Total Paid</th><th></th></tr>
+    <tr><th>#</th><th>Name</th><th>Role</th><th>Mobile</th><th>Joined</th><th>Paid</th><th></th></tr>
     ${rows}
   </table></div>`;
+}
+
+async function setMemberRole(key, role) {
+  await mutate(data => { if (data.members[key]) data.members[key].role = role; });
+  renderMembers();
+  if (currentTab === 'about') renderCommittee();
 }
 
 async function deleteMember(key) {
   if (!adminLoggedIn) return alert('Only admin can remove members.');
   if (!confirm('Remove this member? Their payment records will remain.')) return;
   await mutate(data => { delete data.members[key]; });
+}
+
+// ─── Committee (About tab) ────────────────────────────────────────────────────
+function renderCommittee() {
+  const el = document.getElementById('committee-list');
+  if (!el) return;
+
+  const committee = toArr(CACHE.members)
+    .filter(m => m.role && m.role !== 'Member')
+    .sort((a, b) => {
+      const ai = ROLE_PRIORITY.indexOf(a.role);
+      const bi = ROLE_PRIORITY.indexOf(b.role);
+      return ai - bi;
+    });
+
+  if (!committee.length) {
+    el.innerHTML = '<div class="empty">No committee roles assigned yet. Admin can assign roles from the Members tab.</div>';
+    return;
+  }
+
+  el.innerHTML = `<div class="committee-grid">` +
+    committee.map(m => {
+      const ri = roleInfo(m.role);
+      return `<div class="committee-card">
+        <div class="committee-avatar">${esc(m.name.charAt(0).toUpperCase())}</div>
+        <div class="committee-name">${esc(m.name)}</div>
+        <div class="committee-role-pill" style="background:${ri.bg};color:${ri.color}">${esc(m.role)}</div>
+        <div class="committee-mobile">&#128222; ${esc(m.mobile)}</div>
+      </div>`;
+    }).join('') +
+  `</div>`;
 }
 
 // ─── Pending Member Approvals (Admin) ─────────────────────────────────────────

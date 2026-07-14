@@ -36,6 +36,7 @@
       color: var(--text);
       min-height: 100vh;
       line-height: 1.55;
+      overflow-x: hidden;
     }
 
     header {
@@ -339,6 +340,24 @@
     /* ── Card hover lift ── */
     .hover-lift { transition: transform .22s ease, box-shadow .22s ease; }
     .hover-lift:hover { transform: translateY(-4px); box-shadow: var(--sh2); }
+
+    /* ── Mobile member cards ── */
+    .member-cards { display: none; }
+    @media (max-width: 640px) {
+      .member-table { display: none; }
+      .member-cards { display: flex; flex-direction: column; gap: 10px; }
+    }
+    .member-card-item {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .member-card-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 8px; margin-bottom: 6px;
+    }
+    .member-card-name { font-weight: 700; font-size: .93rem; color: var(--text); }
+    .member-card-meta { font-size: .78rem; color: var(--text3); margin: 4px 0 8px; }
+    .member-card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
 
     /* ── Role badges ── */
     .role-badge {
@@ -1162,34 +1181,49 @@ function renderMembers() {
     return (a.name || '').localeCompare(b.name || '');
   });
 
-  let rows = '';
+  let tableRows = '';
+  let cards     = '';
+
   members.forEach((m, i) => {
-    const paid    = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
-    const role    = m.role || 'Member';
-    const ri      = roleInfo(role);
-    const roleCell = adminLoggedIn
-      ? `<select class="role-select" onchange="setMemberRole('${m._key}',this.value)">
-           ${ROLES.map(r => `<option value="${r.value}"${role===r.value?' selected':''}>${r.value}</option>`).join('')}
-         </select>`
-      : `<span class="role-badge" style="background:${ri.bg};color:${ri.color}">${role}</span>`;
-    const removeBtn = adminLoggedIn
-      ? `<button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button>`
-      : '';
-    rows += `<tr>
+    const paid = payments.filter(p => p.memberId === m._key).reduce((s, p) => s + p.amount, 0);
+    const role = m.role || 'Member';
+    const ri   = roleInfo(role);
+    const roleOptions = ROLES.map(r => `<option value="${r.value}"${role===r.value?' selected':''}>${r.value}</option>`).join('');
+    const roleSelect  = `<select class="role-select" onchange="setMemberRole('${m._key}',this.value)">${roleOptions}</select>`;
+    const roleBadge   = `<span class="role-badge" style="background:${ri.bg};color:${ri.color}">${role}</span>`;
+    const removeBtn   = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button>` : '';
+
+    // Desktop table row
+    tableRows += `<tr>
       <td>${i + 1}</td>
       <td><strong>${esc(m.name)}</strong></td>
-      <td>${roleCell}</td>
+      <td>${adminLoggedIn ? roleSelect : roleBadge}</td>
       <td>${esc(m.mobile)}</td>
       <td>${m.joined}</td>
       <td><span class="badge badge-green">&#8377;${fmt(paid)}</span></td>
       <td>${removeBtn}</td>
     </tr>`;
+
+    // Mobile card
+    cards += `<div class="member-card-item">
+      <div class="member-card-top">
+        <div>
+          <div class="member-card-name">${esc(m.name)}</div>
+          <div style="margin-top:4px;">${roleBadge}</div>
+        </div>
+        <span class="badge badge-green">&#8377;${fmt(paid)}</span>
+      </div>
+      <div class="member-card-meta">&#128222; ${esc(m.mobile)} &nbsp;&middot;&nbsp; Since ${m.joined}</div>
+      ${adminLoggedIn ? `<div class="member-card-actions">${roleSelect}${removeBtn}</div>` : ''}
+    </div>`;
   });
 
-  el.innerHTML = `<div class="table-wrap"><table>
-    <tr><th>#</th><th>Name</th><th>Role</th><th>Mobile</th><th>Joined</th><th>Paid</th><th></th></tr>
-    ${rows}
-  </table></div>`;
+  el.innerHTML = `
+    <div class="table-wrap member-table"><table>
+      <thead><tr><th>#</th><th>Name</th><th>Role</th><th>Mobile</th><th>Joined</th><th>Paid</th><th></th></tr></thead>
+      <tbody>${tableRows}</tbody>
+    </table></div>
+    <div class="member-cards">${cards}</div>`;
 }
 
 async function setMemberRole(key, role) {

@@ -159,6 +159,12 @@
       transition: background .15s;
     }
     .btn-sm-danger:hover { background: #7f1d1d; }
+    .btn-sm-edit {
+      background: none; border: none; cursor: pointer; color: #64748b;
+      font-size: .85rem; padding: 0 4px; margin-left: 4px;
+      vertical-align: middle; line-height: 1; transition: color .15s;
+    }
+    .btn-sm-edit:hover { color: var(--crimson); }
     .btn-logout {
       float: right; margin-top: -2px; background: #64748b; color: #fff;
       padding: 4px 12px; font-size: .74rem; border-radius: 7px;
@@ -1007,6 +1013,22 @@
   </div>
 </div>
 
+<!-- Edit Name Modal -->
+<div id="edit-name-modal" onclick="if(event.target===this)closeEditModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border-radius:14px;padding:28px 24px;width:min(92vw,360px);box-shadow:0 8px 32px rgba(0,0,0,.25);">
+    <h3 style="margin:0 0 16px;font-size:1.05rem;color:var(--text);">Edit Member Name</h3>
+    <input id="edit-name-input" type="text" maxlength="25" placeholder="Enter name"
+           style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.97rem;background:var(--bg);color:var(--text);box-sizing:border-box;font-family:inherit;"
+           oninput="this.value=this.value.replace(/\b\w/g,c=>c.toUpperCase()).replace(/(?<=\S)\w/g,c=>c.toLowerCase())"
+           onkeydown="if(event.key==='Enter')saveEditedName();if(event.key==='Escape')closeEditModal();">
+    <div id="edit-name-alert" style="margin-top:8px;font-size:.82rem;color:var(--crimson);min-height:18px;"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button onclick="saveEditedName()" style="flex:1;padding:9px;background:var(--crimson);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit;">Save</button>
+      <button onclick="closeEditModal()" style="flex:1;padding:9px;background:var(--border);color:var(--text);border:none;border-radius:8px;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   Designed &amp; developed by <strong>Subham Halder</strong> &nbsp;|&nbsp; Shyama Prasad Smriti Sangha &copy; 2025
 </footer>
@@ -1198,11 +1220,12 @@ function renderMembers() {
     const roleSelect  = `<select class="role-select" onchange="setMemberRole('${m._key}',this.value)">${roleOptions}</select>`;
     const roleBadge   = `<span class="role-badge" style="background:${ri.bg};color:${ri.color}">${role}</span>`;
     const removeBtn   = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteMember('${m._key}')">Remove</button>` : '';
+    const editNameBtn = adminLoggedIn ? `<button class="btn-sm-edit" onclick="editMemberName('${m._key}','${esc(m.name)}')">&#9998;</button>` : '';
 
     // Desktop table row
     tableRows += `<tr>
       <td>${i + 1}</td>
-      <td><strong>${esc(m.name)}</strong></td>
+      <td><strong>${esc(m.name)}</strong>${editNameBtn}</td>
       <td>${adminLoggedIn ? roleSelect : roleBadge}</td>
       <td>${esc(m.mobile)}</td>
       <td>${m.joined}</td>
@@ -1214,7 +1237,7 @@ function renderMembers() {
     cards += `<div class="member-card-item">
       <div class="member-card-top">
         <div>
-          <div class="member-card-name">${esc(m.name)}</div>
+          <div class="member-card-name">${esc(m.name)}${editNameBtn}</div>
           <div style="margin-top:4px;">${roleBadge}</div>
         </div>
         <span class="badge badge-green">&#8377;${fmt(paid)}</span>
@@ -1242,6 +1265,34 @@ async function deleteMember(key) {
   if (!adminLoggedIn) return alert('Only admin can remove members.');
   if (!confirm('Remove this member? Their payment records will remain.')) return;
   await mutate(data => { delete data.members[key]; });
+}
+
+let _editingMemberKey = null;
+function editMemberName(key, currentName) {
+  _editingMemberKey = key;
+  const modal = document.getElementById('edit-name-modal');
+  const inp   = document.getElementById('edit-name-input');
+  document.getElementById('edit-name-alert').textContent = '';
+  inp.value = currentName;
+  modal.style.display = 'flex';
+  setTimeout(() => inp.focus(), 80);
+}
+function closeEditModal() {
+  document.getElementById('edit-name-modal').style.display = 'none';
+  _editingMemberKey = null;
+}
+async function saveEditedName() {
+  const inp  = document.getElementById('edit-name-input');
+  const alertEl = document.getElementById('edit-name-alert');
+  const name = inp.value.trim().replace(/\b\w/g,c=>c.toUpperCase()).replace(/(?<=\S)\w/g,c=>c.toLowerCase());
+  if (!name) { alertEl.textContent = 'Name cannot be empty.'; return; }
+  if (name.length > 25) { alertEl.textContent = 'Name must be 25 characters or fewer.'; return; }
+  if (!/^[a-zA-Z\s]+$/.test(name)) { alertEl.textContent = 'Letters and spaces only.'; return; }
+  const key = _editingMemberKey;
+  closeEditModal();
+  await mutate(data => { if (data.members[key]) data.members[key].name = name; });
+  renderMembers();
+  if (currentTab === 'about') renderCommittee();
 }
 
 // ─── Committee (About tab) ────────────────────────────────────────────────────
@@ -1424,6 +1475,24 @@ function verifyAdmin(source) {
   if (source === 'fees') { renderPending(); populateMemberSelect(); renderPayments(); }
   else { renderExpenses(); }
   if (currentTab === 'members') { renderMembers(); renderPendingMembers(); }
+  normalizeAllNames();
+}
+
+function titleCase(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase()).replace(/(?<=\S)\w/g, c => c.toLowerCase());
+}
+
+async function normalizeAllNames() {
+  const members = toArr(CACHE.members);
+  const needsFix = members.filter(m => m.name && m.name !== titleCase(m.name));
+  if (!needsFix.length) return;
+  await mutate(data => {
+    needsFix.forEach(m => {
+      if (data.members[m._key]) data.members[m._key].name = titleCase(m.name);
+    });
+  });
+  if (currentTab === 'members') renderMembers();
+  if (currentTab === 'fees') populateMemberSelect();
 }
 
 function adminLogout() {

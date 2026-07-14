@@ -685,6 +685,7 @@
           </button>
         </div>
         <button class="btn btn-primary" onclick="verifyAdmin('fees')">Login</button>
+        <div id="fee-pass-alert" class="alert" style="margin-top:12px;text-align:left;"></div>
       </div>
     </div>
 
@@ -736,6 +737,7 @@
           </button>
         </div>
         <button class="btn btn-primary" onclick="verifyAdmin('expenses')">Login</button>
+        <div id="exp-pass-alert" class="alert" style="margin-top:12px;text-align:left;"></div>
       </div>
     </div>
 
@@ -1395,14 +1397,18 @@ async function deletePayment(key) {
 
 // ─── Admin / Expenses ─────────────────────────────────────────────────────────
 function verifyAdmin(source) {
-  const passId = source === 'fees' ? 'fee-admin-pass' : 'admin-pass';
-  const inp    = document.getElementById(passId);
+  const passId   = source === 'fees' ? 'fee-admin-pass' : 'admin-pass';
+  const alertId  = source === 'fees' ? 'fee-pass-alert' : 'exp-pass-alert';
+  const inp      = document.getElementById(passId);
   if (inp.value !== ADMIN_PASS) {
     inp.style.borderColor = '#dc3545';
     inp.value = '';
     setTimeout(() => { inp.style.borderColor = ''; }, 1600);
+    alert2(alertId, 'error', '&#10007; Incorrect password. Please try again.');
+    inp.focus();
     return;
   }
+  alert2(alertId, '', '');
   adminLoggedIn = true;
   inp.value = '';
 

@@ -355,7 +355,7 @@
       display: flex; justify-content: space-between;
       align-items: flex-start; gap: 8px; margin-bottom: 6px;
     }
-    .member-card-name { font-weight: 700; font-size: .93rem; color: var(--text); }
+    .member-card-name { font-weight: 700; font-size: .93rem; color: var(--text); word-break: break-word; overflow-wrap: anywhere; }
     .member-card-meta { font-size: .78rem; color: var(--text3); margin: 4px 0 8px; }
     .member-card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
 
@@ -570,7 +570,7 @@
       <div class="form-group">
         <label>Full Name</label>
         <input id="reg-name" type="text" placeholder="Enter member's full name"
-               onkeydown="if(event.key==='Enter') registerMember()">
+               maxlength="60" onkeydown="if(event.key==='Enter') registerMember()">
       </div>
       <div class="form-group">
         <label>Mobile Number</label>
@@ -1125,8 +1125,10 @@ async function registerMember() {
   const name   = document.getElementById('reg-name').value.trim();
   const mobile = document.getElementById('reg-mobile').value.trim();
 
-  if (!name)                    return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
-  if (!/^\d{10}$/.test(mobile)) return alert2('reg-alert', 'error', 'Mobile number must be exactly 10 digits.');
+  if (!name)                            return alert2('reg-alert', 'error', 'Please enter the member\'s full name.');
+  if (name.length > 60)                 return alert2('reg-alert', 'error', 'Name must be 60 characters or fewer.');
+  if (!/^[a-zA-Z\s\.\-']+$/.test(name)) return alert2('reg-alert', 'error', 'Name should contain letters only.');
+  if (!/^\d{10}$/.test(mobile))         return alert2('reg-alert', 'error', 'Mobile number must be exactly 10 digits.');
 
   setLoading('btn-register', true);
   await mutate(data => {
@@ -1725,9 +1727,9 @@ function lookupBill() {
 
   document.getElementById('bill-summary').innerHTML = `
     <div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:6px;">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-        <span><strong>${esc(member.name)}</strong> &nbsp;&middot;&nbsp; ${esc(member.mobile)}</span>
-        <span style="color:var(--text3);font-size:.83rem;">Member since ${member.joined}</span>
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-width:0;">
+        <span style="word-break:break-word;overflow-wrap:anywhere;min-width:0;"><strong>${esc(member.name)}</strong> &nbsp;&middot;&nbsp; ${esc(member.mobile)}</span>
+        <span style="color:var(--text3);font-size:.83rem;white-space:nowrap;">Member since ${member.joined}</span>
       </div>
       <div class="table-wrap"><table>
         <tr><th>#</th><th>Date</th><th>Amount</th><th>Note</th></tr>

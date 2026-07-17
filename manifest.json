@@ -1,0 +1,19 @@
+{
+  "name": "Shyama Prasad Smriti Sangha",
+  "short_name": "SP Sangha",
+  "description": "Club Management & Fund Tracker",
+  "start_url": "./club.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a1006",
+  "theme_color": "#d97706",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

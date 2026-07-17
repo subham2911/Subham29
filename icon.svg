@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#d97706"/>
+  <text x="256" y="320"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="268" font-weight="900"
+        fill="#1a1006" text-anchor="middle">SP</text>
+  <text x="256" y="420"
+        font-family="Arial, sans-serif"
+        font-size="52" font-weight="700" letter-spacing="6"
+        fill="#78350f" text-anchor="middle">SANGHA</text>
+</svg>

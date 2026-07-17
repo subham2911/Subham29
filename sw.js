@@ -23,11 +23,10 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch strategy: network-only for APIs, cache-first for static assets
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // Always go to network for live API calls
+  // Always go to network for live API calls — never cache these
   if (
     url.includes('jsonbin.io') ||
     url.includes('groq.com') ||
@@ -37,13 +36,27 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first for everything else (HTML, manifest, icon)
+  // Network-first for HTML — always fetch latest, fall back to cache if offline
+  if (url.endsWith('.html') || url.endsWith('/') || url === self.location.origin) {
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Cache-first for other static assets (icon, manifest — rarely change)
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(response => {
         const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
         return response;
       });
     })

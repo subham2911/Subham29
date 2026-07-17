@@ -209,8 +209,9 @@
       display: inline-block; padding: 3px 10px;
       border-radius: 20px; font-size: .74rem; font-weight: 700; letter-spacing: .2px;
     }
-    .badge-green { background: var(--green-bg);   color: var(--green); }
-    .badge-red   { background: var(--crimson-bg); color: var(--crimson); }
+    .badge-green  { background: var(--green-bg);   color: var(--green); }
+    .badge-red    { background: var(--crimson-bg); color: var(--crimson); }
+    .badge-purple { background: #f3e8ff; color: #7c3aed; }
 
     .stat-grid {
       display: grid;
@@ -567,6 +568,7 @@
   <button onclick="showTab('members',this)">Members</button>
   <button onclick="showTab('pay',this)">&#128373; Pay Now</button>
   <button onclick="showTab('fees',this)">Record Fees</button>
+  <button onclick="showTab('donations',this)">&#127873; Donations</button>
   <button onclick="showTab('expenses',this)">Expenses</button>
   <button onclick="showTab('balance',this)">Fund Balance</button>
   <button onclick="showTab('about',this)">About</button>
@@ -735,6 +737,62 @@
 
   </div>
 
+  <!-- ===== DONATIONS ===== -->
+  <div id="tab-donations" class="section">
+
+    <!-- Public donations list -->
+    <div class="card">
+      <h2>&#127873; Donation Records <button class="btn-refresh" onclick="refreshTab()">&#8635; Refresh</button></h2>
+      <div id="donations-public-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- Admin gate -->
+    <div id="donation-gate" class="card">
+      <h2>Admin — Record Donation</h2>
+      <div id="donation-pass-alert" class="alert"></div>
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input id="donation-admin-pass" type="password" placeholder="Enter admin password"
+               onkeydown="if(event.key==='Enter') verifyAdmin('donations')">
+      </div>
+      <button class="btn btn-primary" onclick="verifyAdmin('donations')">Login</button>
+    </div>
+
+    <!-- Admin panel -->
+    <div id="donation-panel" style="display:none">
+      <div class="card">
+        <h2>Add Donation <button class="btn-logout" onclick="adminLogout()">Logout</button></h2>
+        <div id="donation-alert" class="alert"></div>
+        <div class="form-group">
+          <label>Donor Name</label>
+          <input id="don-name" type="text" placeholder="e.g. Tapas Roy, Local MLA Office">
+        </div>
+        <div class="form-group">
+          <label>Amount (&#8377;)</label>
+          <input id="don-amount" type="number" min="1" placeholder="Enter donation amount">
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input id="don-date" type="date">
+        </div>
+        <div class="form-group">
+          <label>Purpose / Note <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+          <input id="don-note" type="text" placeholder="e.g. Durga Puja fund, Club renovation">
+        </div>
+        <div class="form-group">
+          <label>Donor Contact <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+          <input id="don-contact" type="tel" maxlength="10" placeholder="10-digit mobile number">
+        </div>
+        <button id="btn-donation" class="btn btn-primary" onclick="addDonation()">Record Donation</button>
+      </div>
+      <div class="card">
+        <h2>All Donations</h2>
+        <div id="donations-admin-list"></div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- ===== EXPENSES ===== -->
   <div id="tab-expenses" class="section">
 
@@ -794,6 +852,11 @@
         <div class="s-label">Fees Collected</div>
         <div class="s-value" id="stat-income">&#8377;0</div>
         <div class="s-sub" id="stat-income-count">0 payments</div>
+      </div>
+      <div class="stat-card hover-lift" style="border-top-color:#7c3aed;">
+        <div class="s-label">Donations</div>
+        <div class="s-value" id="stat-donations" style="color:#7c3aed;">&#8377;0</div>
+        <div class="s-sub" id="stat-donations-count">0 donors</div>
       </div>
       <div class="stat-card stat-expense hover-lift">
         <div class="s-label">Total Expenses</div>
@@ -1066,6 +1129,7 @@ async function loadData() {
   if (!CACHE.payments)       CACHE.payments       = {};
   if (!CACHE.expenses)       CACHE.expenses       = {};
   if (!CACHE.pendingMembers) CACHE.pendingMembers = {};
+  if (!CACHE.donations)     CACHE.donations     = {};
 }
 
 async function saveData() {
@@ -1132,6 +1196,7 @@ function showTab(name, btn) {
     }
   }
   if (name === 'balance') renderBalance();
+  if (name === 'donations') { renderDonationsPublic(); if (adminLoggedIn) renderDonationsAdmin(); }
   if (name === 'expenses' && adminLoggedIn) renderExpenses();
 }
 
@@ -1150,6 +1215,7 @@ function refreshCurrentTab() {
   if (currentTab === 'members') { renderMembers(); renderPendingMembers(); }
   if (currentTab === 'fees' && adminLoggedIn) { renderPending(); populateMemberSelect(); renderPayments(); }
   if (currentTab === 'balance') renderBalance();
+  if (currentTab === 'donations') { renderDonationsPublic(); if (adminLoggedIn) renderDonationsAdmin(); }
   if (currentTab === 'expenses' && adminLoggedIn) renderExpenses();
   if (currentTab === 'about') renderCommittee();
 }
@@ -1459,9 +1525,9 @@ async function deletePayment(key) {
 
 // ─── Admin / Expenses ─────────────────────────────────────────────────────────
 function verifyAdmin(source) {
-  const passId   = source === 'fees' ? 'fee-admin-pass' : 'admin-pass';
-  const alertId  = source === 'fees' ? 'fee-pass-alert' : 'exp-pass-alert';
-  const inp      = document.getElementById(passId);
+  const passId  = source === 'fees' ? 'fee-admin-pass' : source === 'donations' ? 'donation-admin-pass' : 'admin-pass';
+  const alertId = source === 'fees' ? 'fee-pass-alert' : source === 'donations' ? 'donation-pass-alert' : 'exp-pass-alert';
+  const inp     = document.getElementById(passId);
   if (inp.value !== ADMIN_PASS) {
     inp.style.borderColor = '#dc3545';
     inp.value = '';
@@ -1474,14 +1540,19 @@ function verifyAdmin(source) {
   adminLoggedIn = true;
   inp.value = '';
 
-  document.getElementById('admin-gate').style.display  = 'none';
-  document.getElementById('admin-panel').style.display = 'block';
+  document.getElementById('admin-gate').style.display    = 'none';
+  document.getElementById('admin-panel').style.display   = 'block';
   document.getElementById('exp-date').value = todayISO();
 
-  document.getElementById('fee-gate').style.display  = 'none';
-  document.getElementById('fee-panel').style.display = 'block';
+  document.getElementById('fee-gate').style.display      = 'none';
+  document.getElementById('fee-panel').style.display     = 'block';
+
+  document.getElementById('donation-gate').style.display  = 'none';
+  document.getElementById('donation-panel').style.display = 'block';
+  document.getElementById('don-date').value = todayISO();
 
   if (source === 'fees') { renderPending(); populateMemberSelect(); renderPayments(); }
+  else if (source === 'donations') { renderDonationsAdmin(); }
   else { renderExpenses(); }
   if (currentTab === 'members') { renderMembers(); renderPendingMembers(); }
   normalizeAllNames();
@@ -1506,12 +1577,15 @@ async function normalizeAllNames() {
 
 function adminLogout() {
   adminLoggedIn = false;
-  document.getElementById('admin-gate').style.display  = 'block';
-  document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('admin-pass').value          = '';
-  document.getElementById('fee-gate').style.display    = 'block';
-  document.getElementById('fee-panel').style.display   = 'none';
-  document.getElementById('fee-admin-pass').value      = '';
+  document.getElementById('admin-gate').style.display    = 'block';
+  document.getElementById('admin-panel').style.display   = 'none';
+  document.getElementById('admin-pass').value            = '';
+  document.getElementById('fee-gate').style.display      = 'block';
+  document.getElementById('fee-panel').style.display     = 'none';
+  document.getElementById('fee-admin-pass').value        = '';
+  document.getElementById('donation-gate').style.display  = 'block';
+  document.getElementById('donation-panel').style.display = 'none';
+  document.getElementById('donation-admin-pass').value   = '';
 }
 
 async function addExpense() {
@@ -1561,27 +1635,120 @@ async function deleteExpense(key) {
   await mutate(data => { delete data.expenses[key]; });
 }
 
+// ─── Donations ────────────────────────────────────────────────────────────────
+function renderDonationsPublic() {
+  const donations = toArr(CACHE.donations || {}).reverse();
+  const el = document.getElementById('donations-public-list');
+  if (!donations.length) {
+    el.innerHTML = '<div class="empty">No donations recorded yet.</div>';
+    return;
+  }
+  let rows = '';
+  donations.forEach(d => {
+    rows += `<tr>
+      <td>${d.date}</td>
+      <td><strong>${esc(d.donorName)}</strong></td>
+      <td><span class="badge badge-purple">&#8377;${fmt(d.amount)}</span></td>
+      <td>${esc(d.note || '—')}</td>
+    </tr>`;
+  });
+  const total = donations.reduce((s, d) => s + d.amount, 0);
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Donor</th><th>Amount</th><th>Purpose</th></tr>
+    ${rows}
+    <tr style="font-weight:700;border-top:2px solid var(--border);">
+      <td colspan="2">Total</td>
+      <td><span class="badge badge-purple">&#8377;${fmt(total)}</span></td>
+      <td></td>
+    </tr>
+  </table></div>`;
+}
+
+function renderDonationsAdmin() {
+  const donations = toArr(CACHE.donations || {}).reverse();
+  const el = document.getElementById('donations-admin-list');
+  if (!donations.length) { el.innerHTML = '<div class="empty">No donations recorded yet.</div>'; return; }
+  let rows = '';
+  donations.forEach(d => {
+    rows += `<tr>
+      <td>${d.date}</td>
+      <td><strong>${esc(d.donorName)}</strong>${d.contact ? `<br><span style="font-size:.75rem;color:var(--muted)">&#128222; ${esc(d.contact)}</span>` : ''}</td>
+      <td><span class="badge badge-purple">&#8377;${fmt(d.amount)}</span></td>
+      <td>${esc(d.note || '—')}</td>
+      <td><button class="btn-sm-danger" onclick="deleteDonation('${d._key}')">Delete</button></td>
+    </tr>`;
+  });
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Donor</th><th>Amount</th><th>Purpose</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+async function addDonation() {
+  const donorName = document.getElementById('don-name').value.trim();
+  const amount    = parseFloat(document.getElementById('don-amount').value);
+  const date      = document.getElementById('don-date').value;
+  const note      = document.getElementById('don-note').value.trim();
+  const contact   = document.getElementById('don-contact').value.trim();
+
+  if (!donorName)              return alert2('donation-alert', 'error', 'Please enter donor name.');
+  if (!amount || amount <= 0)  return alert2('donation-alert', 'error', 'Please enter a valid amount.');
+  if (!date)                   return alert2('donation-alert', 'error', 'Please select a date.');
+  if (contact && !/^\d{10}$/.test(contact)) return alert2('donation-alert', 'error', 'Contact must be 10 digits.');
+
+  setLoading('btn-donation', true);
+  await mutate(data => {
+    data.donations[genId()] = {
+      donorName, amount, note,
+      contact: contact || '',
+      date: fmtDate(new Date(date + 'T00:00:00'))
+    };
+  }, 'donation-alert');
+  setLoading('btn-donation', false);
+
+  alert2('donation-alert', 'success', '&#8377;' + fmt(amount) + ' donation from ' + donorName + ' recorded.');
+  document.getElementById('don-name').value    = '';
+  document.getElementById('don-amount').value  = '';
+  document.getElementById('don-note').value    = '';
+  document.getElementById('don-contact').value = '';
+  document.getElementById('don-date').value    = todayISO();
+  renderDonationsPublic();
+  renderDonationsAdmin();
+}
+
+async function deleteDonation(key) {
+  if (!confirm('Delete this donation record?')) return;
+  await mutate(data => { delete data.donations[key]; });
+  renderDonationsPublic();
+  renderDonationsAdmin();
+}
+
 // ─── Fund Balance ─────────────────────────────────────────────────────────────
 function renderBalance() {
-  const members  = toArr(CACHE.members);
-  const payments = toArr(CACHE.payments);
-  const expenses = toArr(CACHE.expenses);
+  const members   = toArr(CACHE.members);
+  const payments  = toArr(CACHE.payments);
+  const expenses  = toArr(CACHE.expenses);
+  const donations = toArr(CACHE.donations || {});
 
-  const totalIncome  = payments.reduce((s, p) => s + p.amount, 0);
-  const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
-  const balance      = totalIncome - totalExpense;
+  const totalFees     = payments.reduce((s, p) => s + p.amount, 0);
+  const totalDonation = donations.reduce((s, d) => s + d.amount, 0);
+  const totalExpense  = expenses.reduce((s, e) => s + e.amount, 0);
+  const balance       = totalFees + totalDonation - totalExpense;
 
-  document.getElementById('stat-members').textContent       = members.length;
-  document.getElementById('stat-income').innerHTML          = '&#8377;' + fmt(totalIncome);
-  document.getElementById('stat-expense').innerHTML         = '&#8377;' + fmt(totalExpense);
-  document.getElementById('stat-balance').innerHTML         = '&#8377;' + fmt(Math.abs(balance));
-  document.getElementById('stat-income-count').textContent  = payments.length + ' payment' + (payments.length !== 1 ? 's' : '');
-  document.getElementById('stat-expense-count').textContent = expenses.length + ' entr' + (expenses.length !== 1 ? 'ies' : 'y');
-  document.getElementById('stat-balance').style.color       = balance >= 0 ? '#28a745' : '#dc3545';
+  document.getElementById('stat-members').textContent        = members.length;
+  document.getElementById('stat-income').innerHTML           = '&#8377;' + fmt(totalFees);
+  document.getElementById('stat-donations').innerHTML        = '&#8377;' + fmt(totalDonation);
+  document.getElementById('stat-expense').innerHTML          = '&#8377;' + fmt(totalExpense);
+  document.getElementById('stat-balance').innerHTML          = '&#8377;' + fmt(Math.abs(balance));
+  document.getElementById('stat-income-count').textContent   = payments.length + ' payment' + (payments.length !== 1 ? 's' : '');
+  document.getElementById('stat-donations-count').textContent= donations.length + ' donor' + (donations.length !== 1 ? 's' : '');
+  document.getElementById('stat-expense-count').textContent  = expenses.length + ' entr' + (expenses.length !== 1 ? 'ies' : 'y');
+  document.getElementById('stat-balance').style.color        = balance >= 0 ? '#28a745' : '#dc3545';
 
   const txns = [
-    ...payments.map(p => ({ _key: p._key, date: p.date, desc: 'Fee — ' + p.memberName + (p.note ? ' (' + p.note + ')' : ''), amount: p.amount, type: 'income' })),
-    ...expenses.map(e => ({ _key: e._key, date: e.date, desc: 'Expense — ' + e.desc, amount: e.amount, type: 'expense' }))
+    ...payments.map(p  => ({ _key: p._key,  date: p.date,  desc: 'Fee — ' + p.memberName + (p.note ? ' (' + p.note + ')' : ''), amount: p.amount, type: 'income' })),
+    ...donations.map(d => ({ _key: d._key,  date: d.date,  desc: 'Donation — ' + d.donorName + (d.note ? ' (' + d.note + ')' : ''), amount: d.amount, type: 'donation' })),
+    ...expenses.map(e  => ({ _key: e._key,  date: e.date,  desc: 'Expense — ' + e.desc, amount: e.amount, type: 'expense' }))
   ].sort((a, b) => b._key < a._key ? -1 : 1);
 
   const ledger = document.getElementById('ledger');
@@ -1589,8 +1756,8 @@ function renderBalance() {
 
   let rows = '';
   txns.forEach(tx => {
-    const sign  = tx.type === 'income' ? '+' : '−';
-    const badge = tx.type === 'income' ? 'badge-green' : 'badge-red';
+    const sign  = tx.type === 'expense' ? '−' : '+';
+    const badge = tx.type === 'expense' ? 'badge-red' : tx.type === 'donation' ? 'badge-purple' : 'badge-green';
     rows += `<tr>
       <td>${tx.date}</td>
       <td>${esc(tx.desc)}</td>

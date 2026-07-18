@@ -105,12 +105,28 @@ body{
   box-shadow:0 -2px 10px rgba(44,18,24,0.06);
 }
 .tab-btn{
-  flex:1;padding:10px 8px 10px;border:none;background:transparent;cursor:pointer;
+  flex:1;padding:9px 4px 9px;border:none;background:transparent;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:3px;
   color:var(--ink-muted);font-size:10px;font-weight:600;letter-spacing:.3px;
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;
   transition:color .15s;
 }
+
+/* ── GAME ── */
+.game-wrap{display:flex;flex-direction:column;align-items:center;overflow:hidden;position:relative;}
+.game-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 24px;text-align:center;background:var(--cream);z-index:2;}
+.game-screen.hidden{display:none;}
+.game-robot{font-size:60px;line-height:1;animation:bob 2s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.game-title{font-family:Georgia,serif;font-size:22px;font-weight:700;color:var(--ink);}
+.game-sub{font-size:14px;color:var(--ink-muted);line-height:1.65;max-width:280px;}
+.game-btn{padding:13px 36px;background:var(--wine);color:#fff;border:none;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 18px rgba(123,35,80,0.35);}
+.game-btn:active{opacity:.88;}
+.game-hint{font-size:11px;color:var(--ink-muted);}
+.game-hud{width:100%;max-width:480px;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.game-hud span{font-size:13px;font-weight:600;color:var(--ink);}
+.game-lives{color:var(--rose);font-size:14px;letter-spacing:2px;}
+#game-canvas{display:block;touch-action:none;-webkit-tap-highlight-color:transparent;}
 .tab-btn.on{color:var(--wine);}
 .tab-btn svg{display:block;}
 
@@ -347,6 +363,34 @@ body{
 
 <section class="moti" id="moti" style="display:none"></section>
 
+<!-- GAME VIEW -->
+<div id="game-view" style="display:none">
+  <div class="game-wrap" id="game-wrap">
+    <div class="game-hud" id="game-hud" style="display:none">
+      <span>Score: <strong id="g-score">0</strong></span>
+      <span>Lv <strong id="g-level">1</strong></span>
+      <span class="game-lives" id="g-lives">❤️❤️❤️</span>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <!-- Start screen -->
+    <div class="game-screen" id="gs-start">
+      <div class="game-robot">🤖</div>
+      <div class="game-title">Catch Subham's Love!</div>
+      <div class="game-sub">Subham sends hearts from above — move Riya to catch them all before they fall!</div>
+      <button class="game-btn" onclick="startGame()">Play ❤️</button>
+      <div class="game-hint">Tap left or right side to move Riya</div>
+    </div>
+    <!-- Game over screen -->
+    <div class="game-screen hidden" id="gs-over">
+      <div class="game-robot">🤖</div>
+      <div class="game-title" id="go-title">Game Over!</div>
+      <div class="game-sub" id="go-msg"></div>
+      <div style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:var(--wine)" id="go-score"></div>
+      <button class="game-btn" onclick="startGame()">Play Again ❤️</button>
+    </div>
+  </div>
+</div>
+
 <footer class="footer">
   IIM Bodhgaya &middot; Section A &middot; 2026<br>
   Made with <span class="heart">&#9829;</span> by <span class="name">Subham</span> for Riya
@@ -369,6 +413,16 @@ body{
       <path d="M10 16.5S3 11.9 3 7.5a4 4 0 0 1 7-2.6A4 4 0 0 1 17 7.5c0 4.4-7 9-7 9z" stroke="currentColor" stroke-width="1.5"/>
     </svg>
     For Riya &#9829;
+  </button>
+  <button class="tab-btn" id="tab-game" onclick="switchTab('game')">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="2" y="6" width="16" height="10" rx="3" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="6" y1="9" x2="6" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="4" y1="11" x2="8" y2="11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="12.5" cy="10" r="1" fill="currentColor"/>
+      <circle cx="14.5" cy="12" r="1" fill="currentColor"/>
+    </svg>
+    Play &#127918;
   </button>
 </div>
 
@@ -579,13 +633,221 @@ function plusSvg(){return'<svg width="16" height="16" viewBox="0 0 16 16" fill="
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 function switchTab(t){
   if(calOpen)closeCal();if(efOpen)closeEf();
+  if(activeTab==="game"&&t!=="game")pauseGame();
   activeTab=t;
   document.getElementById("date-nav").style.display=t==="sched"?"":"none";
   document.getElementById("main").style.display=t==="sched"?"":"none";
   document.getElementById("moti").style.display=t==="riya"?"":"none";
+  document.getElementById("game-view").style.display=t==="game"?"":"none";
   document.getElementById("tab-sched").classList.toggle("on",t==="sched");
   document.getElementById("tab-riya").classList.toggle("on",t==="riya");
+  document.getElementById("tab-game").classList.toggle("on",t==="game");
   if(t==="riya")renderMoti();
+  if(t==="game")initGameView();
+}
+
+// ── GAME ─────────────────────────────────────────────────────────────────────
+const G={
+  raf:null,running:false,
+  score:0,lives:3,level:1,
+  sub:{x:0,y:72,dir:1,speed:1.6},
+  riy:{x:0,y:0,vel:0,maxSpd:7},
+  hearts:[],
+  lastDrop:0,dropEvery:1400,heartSpd:2.8,
+  touchDir:0,ts:0,
+  msg:"",msgTime:0,
+  MSGS:["You're amazing, Riya! 🤖","Level up! I'm so proud! 🤖","Unstoppable! 🤖✨","Miss you! Here's more love! 🤖❤️","You're incredible! 🤖","Keep going, Riya! 🤖"],
+  OVER:["Virtual hug from Subham! 🤖🤗","You did great! I'm always with you! 🤖","That's my Riya! 🤖❤️"],
+};
+function gEl(id){return document.getElementById(id);}
+
+function initGameView(){
+  const wrap=gEl("game-wrap");
+  const hdr=document.querySelector(".hdr");
+  const tab=document.querySelector(".tab-bar");
+  const avail=window.innerHeight-(hdr?hdr.offsetHeight:60)-(tab?tab.offsetHeight:60)-2;
+  wrap.style.height=avail+"px";
+  gEl("gs-start").classList.remove("hidden");
+  gEl("gs-over").classList.add("hidden");
+  gEl("game-hud").style.display="none";
+  const canvas=gEl("game-canvas");
+  canvas.style.display="none";
+}
+
+function startGame(){
+  gEl("gs-start").classList.add("hidden");
+  gEl("gs-over").classList.add("hidden");
+  const hud=gEl("game-hud");
+  hud.style.display="flex";
+  const canvas=gEl("game-canvas");
+  canvas.style.display="block";
+
+  const wrap=gEl("game-wrap");
+  canvas.width=wrap.offsetWidth||Math.min(480,window.innerWidth);
+  canvas.height=wrap.offsetHeight-(hud.offsetHeight||40);
+
+  const W=canvas.width,H=canvas.height;
+  G.running=true;G.score=0;G.lives=3;G.level=1;
+  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchDir=0;
+  G.sub.x=W/2;G.sub.y=72;G.sub.dir=1;G.sub.speed=1.6;
+  G.riy.x=W/2;G.riy.y=H-70;G.riy.vel=0;
+  G.heartSpd=2.8;G.dropEvery=1400;G.lastDrop=0;
+  updateHUD();
+
+  canvas.ontouchstart=function(e){
+    e.preventDefault();
+    G.touchDir=e.touches[0].clientX<canvas.getBoundingClientRect().left+W/2?-1:1;
+  };
+  canvas.ontouchmove=function(e){
+    e.preventDefault();
+    G.touchDir=e.touches[0].clientX<canvas.getBoundingClientRect().left+W/2?-1:1;
+  };
+  canvas.ontouchend=function(){G.touchDir=0;};
+  canvas.onclick=function(e){
+    const r=canvas.getBoundingClientRect();
+    G.touchDir=(e.clientX-r.left)<W/2?-1:1;
+    setTimeout(function(){G.touchDir=0;},250);
+  };
+
+  document.onkeydown=function(e){if(e.key==="ArrowLeft")G.touchDir=-1;if(e.key==="ArrowRight")G.touchDir=1;};
+  document.onkeyup=function(e){if(e.key==="ArrowLeft"||e.key==="ArrowRight")G.touchDir=0;};
+
+  if(G.raf)cancelAnimationFrame(G.raf);
+  G.raf=requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(ts){
+  if(!G.running)return;
+  const canvas=gEl("game-canvas");
+  if(!canvas||!canvas.width)return;
+  const W=canvas.width,H=canvas.height;
+  const ctx=canvas.getContext("2d");
+  const dt=G.ts?Math.min(ts-G.ts,50):16;G.ts=ts;
+
+  // Move Subham
+  G.sub.x+=G.sub.dir*G.sub.speed*(dt/16);
+  if(G.sub.x<34){G.sub.x=34;G.sub.dir=1;}
+  if(G.sub.x>W-34){G.sub.x=W-34;G.sub.dir=-1;}
+
+  // Move Riya (smooth)
+  G.riy.vel=G.touchDir*G.riy.maxSpd*(dt/16);
+  G.riy.x=Math.max(34,Math.min(W-34,G.riy.x+G.riy.vel));
+
+  // Drop hearts
+  if(ts-G.lastDrop>G.dropEvery){
+    G.hearts.push({x:G.sub.x,y:G.sub.y+28});
+    G.lastDrop=ts;
+  }
+
+  // Update hearts
+  for(let i=G.hearts.length-1;i>=0;i--){
+    const h=G.hearts[i];
+    h.y+=G.heartSpd*(dt/16);
+    if(h.y>G.riy.y-30&&h.y<G.riy.y+24&&Math.abs(h.x-G.riy.x)<38){
+      G.hearts.splice(i,1);G.score++;
+      if(G.score%5===0)levelUp();
+      updateHUD();continue;
+    }
+    if(h.y>H+10){G.hearts.splice(i,1);G.lives--;updateHUD();if(G.lives<=0){gameOver();return;}}
+  }
+  if(G.msgTime>0)G.msgTime-=dt;
+
+  // Draw
+  const isDark=document.documentElement.dataset.theme==="dark"||(document.documentElement.dataset.theme===""||!document.documentElement.dataset.theme)&&window.matchMedia("(prefers-color-scheme:dark)").matches;
+  ctx.fillStyle=isDark?"#140A0F":"#FBF3EF";
+  ctx.fillRect(0,0,W,H);
+
+  // Divider lines (left/right tap zones hint - very subtle)
+  ctx.strokeStyle=isDark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.04)";
+  ctx.lineWidth=1;
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Subham
+  ctx.font="42px serif";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText("🤖",G.sub.x,G.sub.y);
+  ctx.font="bold 10px -apple-system,sans-serif";
+  ctx.fillStyle=isDark?"rgba(240,232,236,0.45)":"rgba(44,18,24,0.35)";
+  ctx.fillText("Subham",G.sub.x,G.sub.y+28);
+
+  // Hearts
+  ctx.font="24px serif";
+  G.hearts.forEach(function(h){ctx.fillText("❤️",h.x,h.y);});
+
+  // Riya
+  ctx.font="42px serif";
+  ctx.fillText("👩",G.riy.x,G.riy.y);
+  ctx.font="bold 10px -apple-system,sans-serif";
+  ctx.fillStyle=isDark?"rgba(240,232,236,0.45)":"rgba(44,18,24,0.35)";
+  ctx.fillText("Riya",G.riy.x,G.riy.y+28);
+
+  // Tap hint (fade after first catch)
+  if(G.score===0){
+    ctx.fillStyle=isDark?"rgba(240,232,236,0.18)":"rgba(44,18,24,0.12)";
+    ctx.font="12px -apple-system,sans-serif";
+    ctx.textAlign="left";ctx.fillText("← tap",12,H-16);
+    ctx.textAlign="right";ctx.fillText("tap →",W-12,H-16);
+    ctx.textAlign="center";
+  }
+
+  // Subham speech bubble
+  if(G.msgTime>0&&G.msg){
+    const alpha=Math.min(1,G.msgTime/400);
+    ctx.globalAlpha=alpha;
+    const bW=Math.min(W-48,230),bH=40,bX=W/2-bW/2,bY=G.sub.y+36;
+    ctx.fillStyle="#7B2350";
+    gRoundRect(ctx,bX,bY,bW,bH,10);ctx.fill();
+    // tail
+    ctx.beginPath();ctx.moveTo(G.sub.x-7,bY);ctx.lineTo(G.sub.x,bY-10);ctx.lineTo(G.sub.x+7,bY);ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.font="bold 12px -apple-system,sans-serif";
+    ctx.fillText(G.msg,W/2,bY+bH/2);
+    ctx.globalAlpha=1;
+  }
+
+  G.raf=requestAnimationFrame(gameLoop);
+}
+
+function gRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+function levelUp(){
+  G.level++;
+  G.heartSpd=Math.min(9,G.heartSpd+0.45);
+  G.sub.speed=Math.min(5.5,G.sub.speed+0.35);
+  G.dropEvery=Math.max(550,G.dropEvery-120);
+  G.msg=G.MSGS[(G.level-2)%G.MSGS.length];
+  G.msgTime=2200;
+  updateHUD();
+}
+
+function updateHUD(){
+  gEl("g-score").textContent=G.score;
+  gEl("g-level").textContent=G.level;
+  gEl("g-lives").textContent="❤️".repeat(Math.max(0,G.lives))||"💔";
+}
+
+function gameOver(){
+  G.running=false;
+  if(G.raf){cancelAnimationFrame(G.raf);G.raf=null;}
+  document.onkeydown=null;document.onkeyup=null;
+  gEl("game-canvas").style.display="none";
+  gEl("game-hud").style.display="none";
+  gEl("go-score").textContent=G.score+" hearts caught 💕";
+  gEl("go-msg").textContent=G.OVER[Math.floor(G.score/5)%G.OVER.length];
+  gEl("go-title").textContent=G.score>=20?"Champion Riya! 🏆":G.score>=10?"Awesome run, Riya! ✨":"Game Over, Riya! 💕";
+  gEl("gs-over").classList.remove("hidden");
+}
+
+function pauseGame(){
+  if(G.running){G.running=false;if(G.raf){cancelAnimationFrame(G.raf);G.raf=null;}}
+  document.onkeydown=null;document.onkeyup=null;
 }
 
 // ── Motivation render ─────────────────────────────────────────────────────────

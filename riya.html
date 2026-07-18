@@ -790,7 +790,7 @@ function jumpToday(){sel=TODAY;renderPage();updateTodayBtn();}
 // ── Show/hide today button ────────────────────────────────────────────────────
 function updateTodayBtn(){
   const btn=document.getElementById("today-jump");
-  if(btn)btn.style.display=(sel!==TODAY&&TODAY>=START&&TODAY<=END)?"":"none";
+  if(btn)btn.style.display=(sel!==TODAY&&TODAY>=START&&TODAY<=END)?"inline-block":"none";
 }
 
 function tick(){renderPage();updateTodayBtn();}

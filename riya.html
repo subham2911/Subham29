@@ -796,6 +796,10 @@ function updateTodayBtn(){
 function tick(){renderPage();updateTodayBtn();}
 tick();
 setInterval(tick,60000);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
 </script>
 </body>
 </html>

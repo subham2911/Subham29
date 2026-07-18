@@ -378,7 +378,7 @@ body{
       <div class="game-title">Catch Subham's Love!</div>
       <div class="game-sub">Subham sends hearts from above — move Riya to catch them all before they fall!</div>
       <button class="game-btn" onclick="startGame()">Play ❤️</button>
-      <div class="game-hint">Tap left or right side to move Riya</div>
+      <div class="game-hint">Touch &amp; drag anywhere to move Riya</div>
     </div>
     <!-- Game over screen -->
     <div class="game-screen hidden" id="gs-over">
@@ -654,7 +654,7 @@ const G={
   riy:{x:0,y:0,vel:0,maxSpd:7},
   hearts:[],
   lastDrop:0,dropEvery:1400,heartSpd:2.8,
-  touchDir:0,ts:0,
+  touchX:null,ts:0,
   msg:"",msgTime:0,
   MSGS:["You're amazing, Riya! 🤖","Level up! I'm so proud! 🤖","Unstoppable! 🤖✨","Miss you! Here's more love! 🤖❤️","You're incredible! 🤖","Keep going, Riya! 🤖"],
   OVER:["Virtual hug from Subham! 🤖🤗","You did great! I'm always with you! 🤖","That's my Riya! 🤖❤️"],
@@ -688,29 +688,35 @@ function startGame(){
 
   const W=canvas.width,H=canvas.height;
   G.running=true;G.score=0;G.lives=3;G.level=1;
-  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchDir=0;
+  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchX=null;
   G.sub.x=W/2;G.sub.y=72;G.sub.dir=1;G.sub.speed=1.6;
   G.riy.x=W/2;G.riy.y=H-70;G.riy.vel=0;
   G.heartSpd=2.8;G.dropEvery=1400;G.lastDrop=0;
   updateHUD();
 
-  canvas.ontouchstart=function(e){
-    e.preventDefault();
-    G.touchDir=e.touches[0].clientX<canvas.getBoundingClientRect().left+W/2?-1:1;
-  };
-  canvas.ontouchmove=function(e){
-    e.preventDefault();
-    G.touchDir=e.touches[0].clientX<canvas.getBoundingClientRect().left+W/2?-1:1;
-  };
-  canvas.ontouchend=function(){G.touchDir=0;};
-  canvas.onclick=function(e){
-    const r=canvas.getBoundingClientRect();
-    G.touchDir=(e.clientX-r.left)<W/2?-1:1;
-    setTimeout(function(){G.touchDir=0;},250);
-  };
+  // Remove old listeners by cloning canvas
+  const fresh=canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(fresh,canvas);
+  const c=gEl("game-canvas");
 
-  document.onkeydown=function(e){if(e.key==="ArrowLeft")G.touchDir=-1;if(e.key==="ArrowRight")G.touchDir=1;};
-  document.onkeyup=function(e){if(e.key==="ArrowLeft"||e.key==="ArrowRight")G.touchDir=0;};
+  function getCanvasX(clientX){return clientX-c.getBoundingClientRect().left;}
+
+  c.addEventListener("touchstart",function(e){
+    e.preventDefault();G.touchX=getCanvasX(e.touches[0].clientX);
+  },{passive:false});
+  c.addEventListener("touchmove",function(e){
+    e.preventDefault();G.touchX=getCanvasX(e.touches[0].clientX);
+  },{passive:false});
+  c.addEventListener("touchend",function(e){
+    e.preventDefault();G.touchX=null;
+  },{passive:false});
+  c.addEventListener("touchcancel",function(){G.touchX=null;});
+
+  document.onkeydown=function(e){
+    if(e.key==="ArrowLeft")G.touchX=Math.max(0,G.riy.x-60);
+    if(e.key==="ArrowRight")G.touchX=Math.min(W,G.riy.x+60);
+  };
+  document.onkeyup=function(e){if(e.key==="ArrowLeft"||e.key==="ArrowRight")G.touchX=null;};
 
   if(G.raf)cancelAnimationFrame(G.raf);
   G.raf=requestAnimationFrame(gameLoop);
@@ -730,8 +736,12 @@ function gameLoop(ts){
   if(G.sub.x>W-34){G.sub.x=W-34;G.sub.dir=-1;}
 
   // Move Riya (smooth)
-  G.riy.vel=G.touchDir*G.riy.maxSpd*(dt/16);
-  G.riy.x=Math.max(34,Math.min(W-34,G.riy.x+G.riy.vel));
+  if(G.touchX!==null){
+    const diff=G.touchX-G.riy.x;
+    const step=Math.min(Math.abs(diff),G.riy.maxSpd*(dt/16)*2);
+    G.riy.x+=Math.sign(diff)*step;
+  }
+  G.riy.x=Math.max(34,Math.min(W-34,G.riy.x));
 
   // Drop hearts
   if(ts-G.lastDrop>G.dropEvery){
@@ -784,11 +794,10 @@ function gameLoop(ts){
 
   // Tap hint (fade after first catch)
   if(G.score===0){
-    ctx.fillStyle=isDark?"rgba(240,232,236,0.18)":"rgba(44,18,24,0.12)";
+    ctx.fillStyle=isDark?"rgba(240,232,236,0.22)":"rgba(44,18,24,0.15)";
     ctx.font="12px -apple-system,sans-serif";
-    ctx.textAlign="left";ctx.fillText("← tap",12,H-16);
-    ctx.textAlign="right";ctx.fillText("tap →",W-12,H-16);
     ctx.textAlign="center";
+    ctx.fillText("touch & drag to move Riya",W/2,H-16);
   }
 
   // Subham speech bubble

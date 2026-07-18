@@ -589,34 +589,14 @@ function switchTab(t){
 }
 
 // ── Motivation render ─────────────────────────────────────────────────────────
-function weekIndex(){
-  // Weeks counted from Saturday 19 Jul 2026; rolls every Saturday
-  const now=new Date();
-  const dayOfWeek=now.getDay(); // 0=Sun,6=Sat
-  const daysSinceSat=(dayOfWeek===0?1:7-dayOfWeek+1)%7===0?0:(dayOfWeek===6?0:(dayOfWeek+1)%7);
-  // simpler: days since last Saturday (Sat=0 offset)
-  const offset=(dayOfWeek+1)%7; // Sun→1, Mon→2, Tue→3, Wed→4, Thu→5, Fri→6, Sat→0
-  const lastSat=new Date(now);lastSat.setDate(now.getDate()-offset);lastSat.setHours(0,0,0,0);
-  const epoch=new Date("2026-07-18T00:00:00");
-  const week=Math.max(0,Math.floor((lastSat-epoch)/(7*24*60*60*1000)));
-  return((week%DAILY.length)+DAILY.length)%DAILY.length;
-}
-function weekRange(){
-  const now=new Date();
-  const offset=(now.getDay()+1)%7;
-  const sat=new Date(now);sat.setDate(now.getDate()-offset);
-  const fri=new Date(sat);fri.setDate(sat.getDate()+6);
-  const fmt=function(d){return d.toLocaleDateString("en-IN",{day:"numeric",month:"short"});};
-  return fmt(sat)+" – "+fmt(fri);
-}
 function renderMoti(){
-  const idx=weekIndex();
-  const msg=DAILY[idx];
+  const dow=new Date().getDay();
+  const msg=DAILY[dow];
+  const dayName=DN[dow];
   let h='<div class="tm-card">'
-    +'<div class="tm-eyebrow">This Week\'s Note &middot; '+weekRange()+'</div>'
+    +'<div class="tm-eyebrow">Today\'s Note &middot; '+dayName+'</div>'
     +'<div class="tm-quote">&ldquo;'+msg.q+'&rdquo;</div>'
     +'<div class="tm-note">'+msg.n+'</div>'
-    +'<div class="tm-day">Changes every Saturday</div>'
     +'</div>';
 
   h+='<div class="from-hdr"><div class="from-hdr-line"></div><div class="from-hdr-txt">From Subham, with love</div><div class="from-hdr-line"></div></div>';

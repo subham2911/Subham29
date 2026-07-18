@@ -654,7 +654,7 @@ const G={
   riy:{x:0,y:0,vel:0,maxSpd:7},
   hearts:[],
   lastDrop:0,dropEvery:1400,heartSpd:2.8,
-  touchX:null,ts:0,
+  touchX:null,ts:0,multiDrop:1,
   msg:"",msgTime:0,
   MSGS:["You're amazing, Riya! 🤖","Level up! I'm so proud! 🤖","Unstoppable! 🤖✨","Miss you! Here's more love! 🤖❤️","You're incredible! 🤖","Keep going, Riya! 🤖"],
   OVER:["Virtual hug from Subham! 🤖🤗","You did great! I'm always with you! 🤖","That's my Riya! 🤖❤️"],
@@ -688,7 +688,7 @@ function startGame(){
 
   const W=canvas.width,H=canvas.height;
   G.running=true;G.score=0;G.lives=3;G.level=1;
-  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchX=null;
+  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchX=null;G.multiDrop=1;
   G.sub.x=W/2;G.sub.y=72;G.sub.dir=1;G.sub.speed=1.6;
   G.riy.x=W/2;G.riy.y=H-70;G.riy.vel=0;
   G.heartSpd=2.8;G.dropEvery=1400;G.lastDrop=0;
@@ -745,7 +745,10 @@ function gameLoop(ts){
 
   // Drop hearts
   if(ts-G.lastDrop>G.dropEvery){
-    G.hearts.push({x:G.sub.x,y:G.sub.y+28});
+    for(var d=0;d<G.multiDrop;d++){
+      var spread=(G.multiDrop>1?(d-(G.multiDrop-1)/2)*32:0);
+      G.hearts.push({x:Math.max(20,Math.min(W-20,G.sub.x+spread)),y:G.sub.y+28});
+    }
     G.lastDrop=ts;
   }
 
@@ -828,9 +831,13 @@ function gRoundRect(ctx,x,y,w,h,r){
 
 function levelUp(){
   G.level++;
-  G.heartSpd=Math.min(9,G.heartSpd+0.45);
-  G.sub.speed=Math.min(5.5,G.sub.speed+0.35);
-  G.dropEvery=Math.max(550,G.dropEvery-120);
+  // Tiny increments every level — feels gradual, not sudden
+  G.heartSpd=Math.min(11,G.heartSpd+0.25);       // hearts fall a little faster
+  G.sub.speed=Math.min(6,G.sub.speed+0.18);       // Subham moves a little faster
+  G.dropEvery=Math.max(480,G.dropEvery-75);       // drops come slightly more often
+  G.riy.maxSpd=Math.max(3.5,G.riy.maxSpd-0.18);  // Riya becomes slightly harder to move
+  // Extra hearts appear at higher levels
+  G.multiDrop=G.level>=8?3:G.level>=5?2:1;
   G.msg=G.MSGS[(G.level-2)%G.MSGS.length];
   G.msgTime=2200;
   updateHUD();

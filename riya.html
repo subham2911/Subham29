@@ -610,9 +610,12 @@ function renderMoti(){
     +'<div class="msg-sig">&mdash; Subham &hearts;</div>'
     +'</div></div>';
 
-  h+='<div class="affirm-hdr"><div class="affirm-hdr-line"></div><div class="affirm-hdr-txt">Remember always</div><div class="affirm-hdr-line"></div></div>';
+  const dayOffset=Math.floor((new Date()-new Date("2026-07-14T00:00:00"))/(24*60*60*1000));
+  const ai=((dayOffset%AFFIRMS.length)+AFFIRMS.length)%AFFIRMS.length;
+  const todayAffirms=[AFFIRMS[ai],AFFIRMS[(ai+1)%AFFIRMS.length],AFFIRMS[(ai+2)%AFFIRMS.length],AFFIRMS[(ai+3)%AFFIRMS.length]];
+  h+='<div class="affirm-hdr"><div class="affirm-hdr-line"></div><div class="affirm-hdr-txt">Remember always &middot; Changes daily</div><div class="affirm-hdr-line"></div></div>';
   h+='<div class="affirm-grid">';
-  AFFIRMS.forEach(function(a){
+  todayAffirms.forEach(function(a){
     h+='<div class="affirm-card"><div class="affirm-icon">'+a.i+'</div><div class="affirm-text">'+a.t+'</div></div>';
   });
   h+='</div>';

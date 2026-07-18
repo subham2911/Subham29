@@ -599,14 +599,16 @@ function renderMoti(){
     +'<div class="tm-note">'+msg.n+'</div>'
     +'</div>';
 
-  h+='<div class="from-hdr"><div class="from-hdr-line"></div><div class="from-hdr-txt">From Subham, with love</div><div class="from-hdr-line"></div></div>';
-  FROM_SUBHAM.forEach(function(txt){
-    h+='<div class="msg-card"><div class="msg-bar"></div><div class="msg-inner">'
-      +'<div class="msg-from">A note for you</div>'
-      +'<div class="msg-text">&ldquo;'+txt+'&rdquo;</div>'
-      +'<div class="msg-sig">&mdash; Subham &hearts;</div>'
-      +'</div></div>';
-  });
+  const epoch=new Date("2026-07-18T00:00:00");
+  const weekNum=Math.max(0,Math.floor((new Date()-epoch)/(7*24*60*60*1000)));
+  const wIdx=weekNum%FROM_SUBHAM.length;
+  const weekTxt=FROM_SUBHAM[wIdx];
+  h+='<div class="from-hdr"><div class="from-hdr-line"></div><div class="from-hdr-txt">From Subham, with love &middot; Changes every Saturday</div><div class="from-hdr-line"></div></div>';
+  h+='<div class="msg-card"><div class="msg-bar"></div><div class="msg-inner">'
+    +'<div class="msg-from">A note for you</div>'
+    +'<div class="msg-text">&ldquo;'+weekTxt+'&rdquo;</div>'
+    +'<div class="msg-sig">&mdash; Subham &hearts;</div>'
+    +'</div></div>';
 
   h+='<div class="affirm-hdr"><div class="affirm-hdr-line"></div><div class="affirm-hdr-txt">Remember always</div><div class="affirm-hdr-line"></div></div>';
   h+='<div class="affirm-grid">';

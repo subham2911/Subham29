@@ -317,6 +317,25 @@ body{
 .footer .heart{color:var(--rose);}
 .footer .name{color:var(--wine);font-weight:700;}
 
+/* ── SECRET OVERLAY ── */
+.secret-ov{
+  position:fixed;inset:0;z-index:700;
+  background:linear-gradient(160deg,var(--wine2) 0%,var(--wine) 55%,#A0456A 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 28px;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+  overflow-y:auto;text-align:center;
+}
+.secret-ov.open{opacity:1;pointer-events:auto;}
+.secret-icon{font-size:54px;line-height:1;margin-bottom:16px;animation:bob 2s ease-in-out infinite;}
+.secret-title{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#FDF0F5;margin-bottom:22px;line-height:1.35;text-wrap:balance;}
+.secret-body{font-size:15px;color:rgba(253,240,245,.8);line-height:1.85;max-width:310px;text-wrap:balance;}
+.secret-sig{margin-top:24px;font-family:Georgia,serif;font-size:16px;color:rgba(201,149,106,.92);font-style:italic;}
+.secret-close{margin-top:28px;padding:12px 32px;border:1.5px solid rgba(253,240,245,.35);border-radius:50px;background:transparent;color:#FDF0F5;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;transition:background .15s;}
+.secret-close:hover{background:rgba(253,240,245,.12);}
+.seal{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.seal:active{transform:scale(.88);}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;}}
 </style>
 </head>
@@ -324,7 +343,7 @@ body{
 
 <header class="hdr">
   <div class="hdr-brand">
-    <div class="seal"><span>IIM</span></div>
+    <div class="seal" onclick="sealTap()" aria-label="IIM seal"><span>IIM</span></div>
     <div class="hdr-title">
       <h1>IIM Bodhgaya</h1>
       <div class="sec">Section A &middot; Term 1</div>
@@ -424,6 +443,20 @@ body{
     </svg>
     Play &#127918;
   </button>
+</div>
+
+<!-- SECRET OVERLAY -->
+<div class="secret-ov" id="secret-ov" onclick="if(event.target===this)closeSecret()">
+  <div class="secret-icon">💌</div>
+  <div class="secret-title">A secret just for you, Riya 🤍</div>
+  <div class="secret-body">
+    You found it. 😊<br><br>
+    I built every line of this for you — because I wanted you to have something that feels like me, even when I'm far away.<br><br>
+    I know IIM is hard. I know some days feel heavy and the reading never ends. But every single day you show up, you make me the proudest person in the world.<br><br>
+    You are brilliant. You are brave. And you are so deeply loved.
+  </div>
+  <div class="secret-sig">— Subham 🤍</div>
+  <button class="secret-close" onclick="closeSecret()">Close</button>
 </div>
 
 <!-- CALENDAR SHEET -->
@@ -654,7 +687,7 @@ const G={
   riy:{x:0,y:0,vel:0,maxSpd:7},
   hearts:[],
   lastDrop:0,dropEvery:1400,heartSpd:2.8,
-  touchX:null,ts:0,multiDrop:1,
+  touchX:null,ts:0,multiDrop:1,dance:0,
   msg:"",msgTime:0,
   MSGS:["You're amazing, Riya! 🤖","Level up! I'm so proud! 🤖","Unstoppable! 🤖✨","Miss you! Here's more love! 🤖❤️","You're incredible! 🤖","Keep going, Riya! 🤖"],
   OVER:["Virtual hug from Subham! 🤖🤗","You did great! I'm always with you! 🤖","That's my Riya! 🤖❤️"],
@@ -688,7 +721,7 @@ function startGame(){
 
   const W=canvas.width,H=canvas.height;
   G.running=true;G.score=0;G.lives=3;G.level=1;
-  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchX=null;G.multiDrop=1;
+  G.hearts=[];G.msg="";G.msgTime=0;G.ts=0;G.touchX=null;G.multiDrop=1;G.dance=0;
   G.sub.x=W/2;G.sub.y=72;G.sub.dir=1;G.sub.speed=1.6;
   G.riy.x=W/2;G.riy.y=H-70;G.riy.vel=0;
   G.heartSpd=2.8;G.dropEvery=1400;G.lastDrop=0;
@@ -777,11 +810,35 @@ function gameLoop(ts){
   ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
   ctx.setLineDash([]);
 
-  // Subham
-  ctx.font="42px serif";ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.fillText("🤖",G.sub.x,G.sub.y);
+  // Subham (with dance animation on level-up)
+  ctx.save();
+  if(G.dance>0){
+    G.dance-=dt;
+    const f=Math.max(0,G.dance)/1400;
+    const wiggle=Math.sin(f*Math.PI*12)*20*f;
+    const jump=Math.abs(Math.sin(f*Math.PI*6))*18*f;
+    const scale=1+0.3*f;
+    ctx.translate(G.sub.x,G.sub.y-jump);
+    ctx.rotate(wiggle*Math.PI/180);
+    ctx.scale(scale,scale);
+    ctx.font=(42+6*f)+"px serif";
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("🤖",0,0);
+    // sparkles around Subham while dancing
+    const sparks=["✨","⭐","💫"];
+    ctx.font="16px serif";
+    for(var s=0;s<3;s++){
+      const a=(s/3)*Math.PI*2+f*Math.PI*4;
+      ctx.fillText(sparks[s],Math.cos(a)*30,Math.sin(a)*22);
+    }
+  } else {
+    ctx.font="42px serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("🤖",G.sub.x,G.sub.y);
+  }
+  ctx.restore();
   ctx.font="bold 10px -apple-system,sans-serif";
   ctx.fillStyle=isDark?"rgba(240,232,236,0.45)":"rgba(44,18,24,0.35)";
+  ctx.textAlign="center";
   ctx.fillText("Subham",G.sub.x,G.sub.y+28);
 
   // Hearts
@@ -838,6 +895,7 @@ function levelUp(){
   G.riy.maxSpd=Math.max(3.5,G.riy.maxSpd-0.18);  // Riya becomes slightly harder to move
   // Extra hearts appear at higher levels
   G.multiDrop=G.level>=8?3:G.level>=5?2:1;
+  G.dance=1400;
   G.msg=G.MSGS[(G.level-2)%G.MSGS.length];
   G.msgTime=2200;
   updateHUD();
@@ -899,6 +957,23 @@ function renderMoti(){
   h+='</div>';
 
   document.getElementById("moti").innerHTML=h;
+}
+
+// ── Secret unlock (tap IIM seal 5×) ──────────────────────────────────────────
+var _st=0,_stm=null;
+function sealTap(){
+  _st++;
+  if(_stm)clearTimeout(_stm);
+  _stm=setTimeout(function(){_st=0;},2500);
+  if(_st>=5){_st=0;clearTimeout(_stm);openSecret();}
+}
+function openSecret(){
+  document.getElementById("secret-ov").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeSecret(){
+  document.getElementById("secret-ov").classList.remove("open");
+  document.body.style.overflow="";
 }
 
 // ── Calendar ──────────────────────────────────────────────────────────────────

@@ -563,6 +563,11 @@
 
 <div id="sync-bar"></div>
 
+<!-- Read-only notice banner -->
+<div style="background:#fef3c7;border-bottom:1px solid #fcd34d;text-align:center;padding:7px 16px;font-size:.78rem;font-weight:600;color:#92400e;letter-spacing:.2px;">
+  📋 This site is currently in <strong>view-only mode</strong> — all data is visible but no new entries can be added.
+</div>
+
 <nav>
   <button class="active" onclick="showTab('register',this)">&#43; Register</button>
   <button onclick="showTab('members',this)">Members</button>
@@ -579,21 +584,12 @@
 
   <!-- ===== REGISTER ===== -->
   <div id="tab-register" class="section active">
-    <div class="card">
-      <h2>Register New Member</h2>
-      <div id="reg-alert" class="alert"></div>
-      <div class="form-group">
-        <label>Full Name</label>
-        <input id="reg-name" type="text" placeholder="Enter member's full name"
-               maxlength="25" onkeydown="if(event.key==='Enter') registerMember()"
-               oninput="this.value=this.value.replace(/\b\w/g,c=>c.toUpperCase()).replace(/(?<=\S)\w/g,c=>c.toLowerCase())">
-      </div>
-      <div class="form-group">
-        <label>Mobile Number</label>
-        <input id="reg-mobile" type="tel" maxlength="10" placeholder="10-digit mobile number"
-               onkeydown="if(event.key==='Enter') registerMember()">
-      </div>
-      <button id="btn-register" class="btn btn-primary" onclick="registerMember()">Register Member</button>
+    <div class="card" style="text-align:center;padding:44px 24px;">
+      <div style="font-size:2.8rem;margin-bottom:14px;">🔒</div>
+      <h2 style="border:none;padding:0;margin-bottom:10px;color:var(--text);">Registration Closed</h2>
+      <p style="color:var(--text2);font-size:.92rem;max-width:400px;margin:0 auto;">
+        New member registration is currently closed. You can still view the members list, fund balance, and other information from the tabs above.
+      </p>
     </div>
   </div>
 
@@ -1120,6 +1116,7 @@ const BIN_ID  = '6a550358da38895dfe577e4b';
 const API_KEY = '$2a$10$tk3LJ39fSijtbeeqs/lV5uWtpviYGVdOpvRm2R9aerIzJ1rzulDaa';
 const API_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
 const ADMIN_PASS = 'admin@spsangha';
+const READ_ONLY  = true;   // site is view-only — no new data will be saved
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let CACHE       = { members: {}, payments: {}, expenses: {}, pendingMembers: {} };
@@ -1155,6 +1152,12 @@ async function saveData() {
 
 // Fetch latest, apply mutation fn, save back
 async function mutate(fn, alertId) {
+  if (READ_ONLY) {
+    if (alertId) alert2(alertId, 'error', 'This site is in read-only mode — no new data can be saved.');
+    else syncBar('error', 'Read-only mode — no changes can be saved.');
+    setTimeout(() => syncBar('', ''), 3000);
+    return;
+  }
   if (busy) return;
   busy = true;
   syncBar('saving', 'Saving...');
@@ -1544,6 +1547,11 @@ function togglePassVisibility(inputId, eyeId) {
 
 // ─── Admin / Expenses ─────────────────────────────────────────────────────────
 function verifyAdmin(source) {
+  if (READ_ONLY) {
+    const alertId = source === 'fees' ? 'fee-pass-alert' : source === 'donations' ? 'donation-pass-alert' : 'exp-pass-alert';
+    alert2(alertId, 'error', 'Admin features are disabled — the site is in read-only mode.');
+    return;
+  }
   const passId  = source === 'fees' ? 'fee-admin-pass' : source === 'donations' ? 'donation-admin-pass' : 'admin-pass';
   const alertId = source === 'fees' ? 'fee-pass-alert' : source === 'donations' ? 'donation-pass-alert' : 'exp-pass-alert';
   const inp     = document.getElementById(passId);

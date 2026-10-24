@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>86th Kali Pujo 2026 — Shyama Prasad Smriti Sangha</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --red:       #8B1A1A;
+  --red-l:     #a82020;
+  --saffron:   #E07B15;
+  --purple:    #7c3aed;
+  --bg:        #f3ebe0;
+  --card:      #ffffff;
+  --border:    #e4d4c2;
+  --text:      #1a0a02;
+  --text2:     #5c3d28;
+  --text3:     #9c7a62;
+  --green:     #166534;
+  --green-bg:  #dcfce7;
+  --crimson:   #991b1b;
+  --crimson-bg:#fee2e2;
+  --amber:     #92400e;
+  --amber-bg:  #fef3c7;
+  --sh1: 0 1px 3px rgba(80,20,0,.05), 0 4px 16px rgba(80,20,0,.07);
+  --sh2: 0 4px 12px rgba(80,20,0,.10), 0 12px 32px rgba(80,20,0,.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+header {
+  background: linear-gradient(155deg, #6b0d0d 0%, #9b1c1c 50%, #c0392b 100%);
+  color: #fff;
+  text-align: center;
+  padding: 26px 24px 22px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.28);
+  position: relative; overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 60%, rgba(255,153,51,.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 40%, rgba(255,153,51,.10) 0%, transparent 55%);
+  pointer-events: none;
+}
+header h1 {
+  font-size: 1.7rem; font-weight: 800; letter-spacing: .3px;
+  position: relative; text-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+header p  {
+  font-size: .85rem; opacity: .85; margin-top: 6px;
+  font-weight: 600; letter-spacing: .3px; position: relative;
+}
+
+#sync-bar {
+  display: none; text-align: center;
+  font-size: .76rem; padding: 6px; font-weight: 600; letter-spacing: .2px;
+}
+#sync-bar.saving { display:block; background: #dbeafe; color: #1e40af; }
+#sync-bar.error  { display:block; background: var(--crimson-bg); color: var(--crimson); }
+#sync-bar.show   { display:block; background: #fef9c3; color: #713f12; }
+
+#admin-bar {
+  background: #fff; border-bottom: 1px solid var(--border);
+  padding: 9px 16px; display: flex; align-items: center; justify-content: center;
+  gap: 8px; flex-wrap: wrap; font-size: .82rem;
+}
+#admin-bar .pwd-wrap { margin: 0; max-width: 170px; }
+#admin-bar .pwd-wrap input { padding: 7px 36px 7px 12px; font-size: .82rem; }
+#admin-bar-status { font-weight: 700; color: var(--green); }
+#admin-alert { color: var(--crimson); font-weight: 600; font-size: .78rem; }
+
+nav {
+  background: #fff;
+  display: flex; justify-content: center; flex-wrap: wrap;
+  border-bottom: 2px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(80,20,0,.08);
+}
+nav button {
+  padding: 14px 18px;
+  border: none; background: none; cursor: pointer;
+  font-family: inherit;
+  font-size: .82rem; font-weight: 600; color: var(--text3);
+  border-bottom: 3px solid transparent;
+  transition: color .18s, background .18s;
+  letter-spacing: .1px;
+}
+nav button:hover  { color: var(--red); background: #fdf5ef; }
+nav button.active { color: var(--red); border-bottom-color: var(--saffron); background: #fef8f3; }
+
+.container { max-width: 940px; margin: 0 auto; padding: 26px 16px; }
+.section { display: none; }
+.section.active { display: block; }
+
+.card {
+  background: var(--card); border-radius: 16px;
+  padding: 24px 26px; box-shadow: var(--sh1);
+  margin-bottom: 20px; border: 1px solid var(--border);
+}
+.card h2 {
+  font-size: .97rem; font-weight: 700; color: var(--red);
+  border-bottom: 2px solid var(--saffron);
+  padding-bottom: 10px; margin-bottom: 18px; letter-spacing: .2px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.tab-total { font-size: .72rem; font-weight: 700; color: var(--text3); text-transform: none; border: none; }
+
+.form-group { margin-bottom: 15px; }
+label {
+  display: block; font-size: .72rem; font-weight: 700;
+  color: var(--text2); margin-bottom: 6px;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+input, select {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: .9rem; font-family: inherit;
+  background: #fdfaf7; color: var(--text);
+  transition: border-color .18s, box-shadow .18s;
+}
+input:focus, select:focus {
+  outline: none; border-color: var(--saffron); background: #fff;
+  box-shadow: 0 0 0 3px rgba(224,123,21,.13);
+}
+
+.btn {
+  padding: 10px 22px; border: none; border-radius: 10px;
+  cursor: pointer; font-size: .88rem; font-weight: 700; font-family: inherit;
+  letter-spacing: .2px; transition: background .18s, transform .12s, box-shadow .18s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-l) 100%);
+  color: #fff; width: 100%; padding: 13px;
+  box-shadow: 0 3px 10px rgba(139,26,26,.28);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--red-l) 0%, #c0392b 100%);
+  transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,26,26,.34);
+}
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+.btn-sm-danger {
+  background: var(--crimson); color: #fff;
+  padding: 4px 11px; font-size: .74rem; border-radius: 7px;
+  border: none; cursor: pointer; font-family: inherit; font-weight: 600;
+  transition: background .15s;
+}
+.btn-sm-danger:hover { background: #7f1d1d; }
+.btn-sm {
+  background: var(--saffron); color: #fff;
+  padding: 6px 13px; font-size: .76rem; border-radius: 7px;
+  border: none; cursor: pointer; font-family: inherit; font-weight: 700;
+}
+.btn-sm:hover { background: #c46a10; }
+.btn-logout {
+  background: #64748b; color: #fff;
+  padding: 5px 13px; font-size: .74rem; border-radius: 7px;
+  border: none; cursor: pointer; font-family: inherit; font-weight: 600;
+}
+.btn-logout:hover { background: #475569; }
+
+.alert {
+  padding: 10px 15px; border-radius: 10px;
+  margin-bottom: 14px; font-size: .85rem; font-weight: 500; display: none;
+}
+.alert-success { background: var(--green-bg);   color: var(--green);   border-left: 4px solid #16a34a; }
+.alert-error   { background: var(--crimson-bg); color: var(--crimson); border-left: 4px solid #dc2626; }
+
+.table-wrap { overflow-x: auto; border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+thead tr { background: linear-gradient(90deg, var(--red) 0%, var(--red-l) 100%); }
+th {
+  color: #fff; padding: 10px 13px; text-align: left;
+  font-weight: 600; font-size: .75rem; letter-spacing: .4px; text-transform: uppercase;
+}
+th:first-child { border-radius: 10px 0 0 0; }
+th:last-child  { border-radius: 0 10px 0 0; }
+td { padding: 9px 13px; border-bottom: 1px solid #f0e8de; vertical-align: middle; }
+tbody tr:nth-child(even) td { background: #fdf9f5; }
+tbody tr:hover td { background: #fef3e6; }
+
+.badge {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 20px; font-size: .74rem; font-weight: 700; letter-spacing: .2px;
+  white-space: nowrap;
+}
+.badge-green  { background: var(--green-bg);   color: var(--green); }
+.badge-red    { background: var(--crimson-bg); color: var(--crimson); }
+.badge-purple { background: #f3e8ff; color: #7c3aed; }
+.badge-amber  { background: var(--amber-bg); color: var(--amber); }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card); border-radius: 16px; padding: 22px 18px 18px;
+  text-align: center; box-shadow: var(--sh1);
+  border: 1px solid var(--border); border-top: 4px solid var(--border);
+}
+.stat-chanda   { border-top-color: #16a34a; }
+.stat-donation { border-top-color: var(--purple); }
+.stat-expense  { border-top-color: #dc2626; }
+.stat-balance  { border-top-color: var(--red); }
+.stat-card .s-label { font-size: .7rem; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.stat-card .s-value { font-size: 1.85rem; font-weight: 800; margin: 9px 0 4px; line-height: 1; }
+.stat-card .s-sub   { font-size: .74rem; color: var(--text3); }
+.stat-chanda   .s-value { color: #16a34a; }
+.stat-donation .s-value { color: var(--purple); }
+.stat-expense  .s-value { color: #dc2626; }
+.stat-balance  .s-value { color: var(--red); }
+
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 40px; }
+.pwd-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); padding: 4px; line-height: 0; transition: color .15s;
+}
+.pwd-toggle:hover { color: var(--text2); }
+.pwd-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+
+.tab-note { text-align: center; color: var(--text3); font-size: .86rem; padding: 20px; font-weight: 500; }
+.empty { text-align: center; color: var(--text3); padding: 28px 0; font-size: .86rem; font-weight: 500; }
+
+.spinner-wrap { text-align: center; padding: 32px; }
+.spinner {
+  display: inline-block; width: 26px; height: 26px;
+  border: 3px solid #f0ddd4; border-top-color: var(--red);
+  border-radius: 50%; animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+footer {
+  text-align: center; padding: 22px 16px 28px;
+  font-size: .76rem; color: var(--text3); font-weight: 500;
+}
+
+#print-area { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area {
+    display: block !important;
+    position: absolute; left: 0; top: 0; width: 100%;
+    padding: 30px; font-family: 'Poppins', sans-serif; color: #1a0a02;
+  }
+  #print-area table { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+  #print-area th, #print-area td { border: 1px solid #333; padding: 7px 10px; font-size: .88rem; text-align: left; }
+  #print-area th { background: #eee; }
+}
+
+@media (max-width: 600px) {
+  header h1 { font-size: 1.4rem; }
+  .card { padding: 18px 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🪔 Shyama Prasad Smriti Sangha 🪔</h1>
+  <p>86th Year — Shree Shree Kali Pujo, 2026 — Accounts Ledger</p>
+</header>
+
+<div id="sync-bar"></div>
+
+<div id="admin-bar">
+  <div id="admin-bar-logged-out">
+    <span>🔐</span>
+    <div class="pwd-wrap" style="display:inline-block;">
+      <input id="admin-pass-input" type="password" placeholder="Committee password"
+             onkeydown="if(event.key==='Enter') verifyAdmin()">
+      <button type="button" class="pwd-toggle" onclick="togglePwd('admin-pass-input', this)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
+    <button class="btn-sm" onclick="verifyAdmin()">Login</button>
+    <span id="admin-alert"></span>
+  </div>
+  <div id="admin-bar-logged-in" style="display:none;">
+    <span id="admin-bar-status">✅ Committee admin</span>
+    <button class="btn-logout" onclick="adminLogout()">Logout</button>
+  </div>
+  <button class="btn-sm" style="background:var(--text3);" onclick="refreshTab()">⟳ Refresh</button>
+</div>
+
+<nav>
+  <button class="active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+  <button onclick="showTab('chanda',this)">🪔 Chanda</button>
+  <button onclick="showTab('donations',this)">🎁 Donations</button>
+  <button onclick="showTab('expenses',this)">🧾 Expenses</button>
+</nav>
+
+<div class="container">
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="tab-dashboard" class="section active">
+    <div class="stat-grid">
+      <div class="stat-card stat-chanda">
+        <div class="s-label">Chanda Collected</div>
+        <div class="s-value" id="stat-chanda">&#8377;0</div>
+        <div class="s-sub" id="stat-chanda-count">0 entries</div>
+      </div>
+      <div class="stat-card stat-donation">
+        <div class="s-label">Donations</div>
+        <div class="s-value" id="stat-donation">&#8377;0</div>
+        <div class="s-sub" id="stat-donation-count">0 donors</div>
+      </div>
+      <div class="stat-card stat-expense">
+        <div class="s-label">Total Expenses</div>
+        <div class="s-value" id="stat-expense">&#8377;0</div>
+        <div class="s-sub" id="stat-expense-count">0 entries</div>
+      </div>
+      <div class="stat-card stat-balance">
+        <div class="s-label" id="stat-balance-label">Net Balance</div>
+        <div class="s-value" id="stat-balance">&#8377;0</div>
+        <div class="s-sub">Income − Expenses</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Full Ledger
+        <span>
+          <button class="btn-sm" onclick="printSummary()">🖨️ Print Accounts Summary</button>
+        </span>
+      </h2>
+      <div id="ledger"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ===== CHANDA ===== -->
+  <div id="tab-chanda" class="section">
+    <div class="card">
+      <h2>Collection by Member <span class="tab-total" id="chanda-total-badge"></span></h2>
+      <div id="chanda-by-type" style="margin-bottom:14px;"></div>
+      <div id="chanda-by-collector"></div>
+    </div>
+    <div class="card">
+      <h2>Day-wise Collection History</h2>
+      <div id="chanda-by-date"></div>
+    </div>
+    <div id="chanda-add-card" class="card" style="display:none">
+      <h2>Record Chanda</h2>
+      <div id="chanda-alert" class="alert"></div>
+      <div class="form-group">
+        <label>Collector Name</label>
+        <input id="chanda-collector" type="text" placeholder="Who is collecting this?">
+      </div>
+      <div class="form-group">
+        <label>Collection Type</label>
+        <select id="chanda-type" onchange="updateChandaPlaceholder()">
+          <option value="Door-to-door">Door-to-door</option>
+          <option value="Vehicle Collection">Vehicle Collection</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contributor Name <span id="chanda-contributor-optional-tag" style="display:none;font-weight:400;color:var(--text3);text-transform:none;">(optional)</span></label>
+        <input id="chanda-contributor" type="text" placeholder="Household / person who gave chanda">
+      </div>
+      <div class="form-group">
+        <label>Amount (&#8377;)</label>
+        <input id="chanda-amount" type="number" min="1" placeholder="Enter amount">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="chanda-date" type="date">
+      </div>
+      <div class="form-group">
+        <label>Note <span style="font-weight:400;color:var(--text3);text-transform:none;">(optional)</span></label>
+        <input id="chanda-note" type="text" placeholder="Any remarks">
+      </div>
+      <button id="btn-chanda" class="btn btn-primary" onclick="addChanda()">Record Chanda</button>
+    </div>
+    <div id="chanda-locked-note" class="card tab-note">🔒 Committee login required (top of page) to record new chanda entries.</div>
+    <div class="card">
+      <h2>All Chanda Entries</h2>
+      <div id="chanda-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== DONATIONS ===== -->
+  <div id="tab-donations" class="section">
+    <div id="donation-add-card" class="card" style="display:none">
+      <h2>Record Donation</h2>
+      <div id="donation-alert" class="alert"></div>
+      <div class="form-group">
+        <label>Donor Name</label>
+        <input id="don-name" type="text" placeholder="e.g. Tapas Roy, Local MLA Office">
+      </div>
+      <div class="form-group">
+        <label>Amount (&#8377;)</label>
+        <input id="don-amount" type="number" min="1" placeholder="Enter donation amount">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="don-date" type="date">
+      </div>
+      <div class="form-group">
+        <label>Purpose / Note <span style="font-weight:400;color:var(--text3);text-transform:none;">(optional)</span></label>
+        <input id="don-note" type="text" placeholder="e.g. Idol, Pandal sponsorship">
+      </div>
+      <div class="form-group">
+        <label>Donor Contact <span style="font-weight:400;color:var(--text3);text-transform:none;">(optional)</span></label>
+        <input id="don-contact" type="tel" maxlength="10" placeholder="10-digit mobile number">
+      </div>
+      <button id="btn-donation" class="btn btn-primary" onclick="addDonation()">Record Donation</button>
+    </div>
+    <div id="donation-locked-note" class="card tab-note">🔒 Committee login required (top of page) to record new donations.</div>
+    <div class="card">
+      <h2>All Donations <span class="tab-total" id="donation-total-badge"></span></h2>
+      <div id="donation-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ===== EXPENSES ===== -->
+  <div id="tab-expenses" class="section">
+    <div id="expense-add-card" class="card" style="display:none">
+      <h2>Record Expense</h2>
+      <div id="expense-alert" class="alert"></div>
+      <div class="form-group">
+        <label>Description</label>
+        <input id="exp-desc" type="text" placeholder="e.g. Idol decoration, Dhak payment">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="exp-category">
+          <option>Idol</option>
+          <option>Decoration</option>
+          <option>Light</option>
+          <option>Pandal</option>
+          <option>Puja Samagri</option>
+          <option>Priest</option>
+          <option>Dhaak</option>
+          <option>Cultural Program</option>
+          <option>Food &amp; Bhog</option>
+          <option>Security &amp; Permission</option>
+          <option>Immersion (Visarjan)</option>
+          <option>Miscellaneous</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Amount (&#8377;)</label>
+        <input id="exp-amount" type="number" min="1" placeholder="Enter amount">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input id="exp-date" type="date">
+      </div>
+      <button id="btn-expense" class="btn btn-primary" onclick="addExpense()">Record Expense</button>
+    </div>
+    <div id="expense-locked-note" class="card tab-note">🔒 Committee login required (top of page) to record new expenses.</div>
+    <div class="card">
+      <h2>All Expenses <span class="tab-total" id="expense-total-badge"></span></h2>
+      <div id="expense-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Designed &amp; developed by <strong>Subham Halder</strong> &nbsp;|&nbsp; Shyama Prasad Smriti Sangha &copy; 2026
+</footer>
+
+<div id="print-area"></div>
+
+<script>
+// ─── Config ───────────────────────────────────────────────────────────────────
+const BIN_ID      = '6adc7ac1ac6210605a4e3c24';
+const ACCESS_KEY  = '$2a$10$80vqJTlzeJ617JCFHjouCeLkYOf9YQ9PrWItbOm2MgDUKGwBjoJVO';
+const API_URL     = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+const ADMIN_PASS  = 'Hello123@';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let CACHE         = { chanda: {}, donations: {}, expenses: {} };
+let currentTab    = 'dashboard';
+let adminLoggedIn = false;
+let busy          = false;
+
+// ─── JSONBin helpers ──────────────────────────────────────────────────────────
+async function loadData() {
+  const res = await fetch(API_URL, {
+    headers: { 'X-Access-Key': ACCESS_KEY, 'X-Bin-Meta': 'false' }
+  });
+  if (!res.ok) throw new Error('Load failed: ' + res.status);
+  CACHE = await res.json();
+  if (!CACHE.chanda)    CACHE.chanda    = {};
+  if (!CACHE.donations) CACHE.donations = {};
+  if (!CACHE.expenses)  CACHE.expenses  = {};
+}
+
+async function saveData() {
+  const res = await fetch(API_URL, {
+    method: 'PUT',
+    headers: { 'X-Access-Key': ACCESS_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(CACHE)
+  });
+  if (!res.ok) throw new Error('Save failed: ' + res.status);
+}
+
+async function mutate(fn, alertId) {
+  if (busy) return;
+  busy = true;
+  syncBar('saving', 'Saving...');
+  try {
+    await loadData();
+    fn(CACHE);
+    await saveData();
+    syncBar('', '');
+    refreshCurrentTab();
+  } catch (e) {
+    syncBar('error', 'Network error — please try again.');
+    if (alertId) alert2(alertId, 'error', 'Could not save. Check your connection.');
+  }
+  busy = false;
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ─── Sync bar ─────────────────────────────────────────────────────────────────
+function syncBar(type, msg) {
+  const bar = document.getElementById('sync-bar');
+  if (!msg) { bar.classList.remove('show', 'saving', 'error'); return; }
+  bar.className = 'show ' + type;
+  bar.textContent = msg;
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  currentTab = name;
+  refreshCurrentTab();
+}
+
+async function refreshTab() {
+  syncBar('saving', 'Loading latest data...');
+  try {
+    await loadData();
+    syncBar('', '');
+    refreshCurrentTab();
+  } catch (e) {
+    syncBar('error', 'Could not refresh — check your connection.');
+  }
+}
+
+function refreshCurrentTab() {
+  if (currentTab === 'dashboard') renderDashboard();
+  if (currentTab === 'chanda')    renderChanda();
+  if (currentTab === 'donations') renderDonations();
+  if (currentTab === 'expenses')  renderExpenses();
+}
+
+// ─── Admin login ──────────────────────────────────────────────────────────────
+function verifyAdmin() {
+  const inp = document.getElementById('admin-pass-input');
+  if (inp.value === ADMIN_PASS) {
+    adminLoggedIn = true;
+    inp.value = '';
+    document.getElementById('admin-alert').textContent = '';
+    updateAdminUI();
+  } else {
+    document.getElementById('admin-alert').textContent = 'Wrong password';
+    setTimeout(() => { document.getElementById('admin-alert').textContent = ''; }, 3000);
+  }
+}
+function adminLogout() {
+  adminLoggedIn = false;
+  updateAdminUI();
+}
+function updateAdminUI() {
+  document.getElementById('admin-bar-logged-out').style.display = adminLoggedIn ? 'none' : 'inline-flex';
+  document.getElementById('admin-bar-logged-in').style.display  = adminLoggedIn ? 'inline-flex' : 'none';
+  document.getElementById('chanda-add-card').style.display      = adminLoggedIn ? 'block' : 'none';
+  document.getElementById('chanda-locked-note').style.display   = adminLoggedIn ? 'none'  : 'block';
+  document.getElementById('donation-add-card').style.display    = adminLoggedIn ? 'block' : 'none';
+  document.getElementById('donation-locked-note').style.display = adminLoggedIn ? 'none'  : 'block';
+  document.getElementById('expense-add-card').style.display     = adminLoggedIn ? 'block' : 'none';
+  document.getElementById('expense-locked-note').style.display  = adminLoggedIn ? 'none'  : 'block';
+  refreshCurrentTab();
+}
+
+function togglePwd(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function updateChandaPlaceholder() {
+  const isVehicle = document.getElementById('chanda-type').value === 'Vehicle Collection';
+  document.getElementById('chanda-contributor').placeholder =
+    isVehicle ? 'e.g. White Swift, Bus rider' : 'Household / person who gave chanda';
+  document.getElementById('chanda-contributor-optional-tag').style.display = isVehicle ? 'inline' : 'none';
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const chanda    = toArr(CACHE.chanda);
+  const donations = toArr(CACHE.donations);
+  const expenses  = toArr(CACHE.expenses);
+
+  const totalChanda   = chanda.reduce((s, c) => s + c.amount, 0);
+  const totalDonation = donations.reduce((s, d) => s + d.amount, 0);
+  const totalExpense  = expenses.reduce((s, e) => s + e.amount, 0);
+  const balance       = totalChanda + totalDonation - totalExpense;
+
+  document.getElementById('stat-chanda').innerHTML         = '&#8377;' + fmt(totalChanda);
+  document.getElementById('stat-chanda-count').textContent = chanda.length + ' entr' + (chanda.length !== 1 ? 'ies' : 'y');
+  document.getElementById('stat-donation').innerHTML        = '&#8377;' + fmt(totalDonation);
+  document.getElementById('stat-donation-count').textContent= donations.length + ' donor' + (donations.length !== 1 ? 's' : '');
+  document.getElementById('stat-expense').innerHTML         = '&#8377;' + fmt(totalExpense);
+  document.getElementById('stat-expense-count').textContent = expenses.length + ' entr' + (expenses.length !== 1 ? 'ies' : 'y');
+  document.getElementById('stat-balance').innerHTML          = '&#8377;' + fmt(Math.abs(balance));
+  document.getElementById('stat-balance').style.color        = balance >= 0 ? '#16a34a' : '#dc2626';
+  document.getElementById('stat-balance-label').textContent  = balance >= 0 ? 'Net Surplus' : 'Net Deficit';
+
+  const txns = [
+    ...chanda.map(c    => ({ _key: c._key, date: c.date, desc: 'Chanda — ' + (c.contributor || 'Vehicle collection') + ' (by ' + c.collector + ')' + (c.note ? ' — ' + c.note : ''), amount: c.amount, type: 'chanda' })),
+    ...donations.map(d => ({ _key: d._key, date: d.date, desc: 'Donation — ' + d.donorName + (d.note ? ' (' + d.note + ')' : ''), amount: d.amount, type: 'donation' })),
+    ...expenses.map(e  => ({ _key: e._key, date: e.date, desc: 'Expense — ' + e.desc + (e.category ? ' [' + e.category + ']' : ''), amount: e.amount, type: 'expense' }))
+  ].sort((a, b) => b._key < a._key ? -1 : 1);
+
+  const ledger = document.getElementById('ledger');
+  if (!txns.length) { ledger.innerHTML = '<div class="empty">No transactions yet.</div>'; return; }
+
+  let rows = '';
+  txns.forEach(tx => {
+    const sign  = tx.type === 'expense' ? '−' : '+';
+    const badge = tx.type === 'expense' ? 'badge-red' : tx.type === 'donation' ? 'badge-purple' : 'badge-green';
+    rows += `<tr>
+      <td>${tx.date}</td>
+      <td>${esc(tx.desc)}</td>
+      <td><span class="badge ${badge}">${sign}&#8377;${fmt(tx.amount)}</span></td>
+    </tr>`;
+  });
+
+  ledger.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Description</th><th>Amount</th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+// ─── Chanda ───────────────────────────────────────────────────────────────────
+function renderChanda() {
+  const chanda = toArr(CACHE.chanda);
+  const total  = chanda.reduce((s, c) => s + c.amount, 0);
+  document.getElementById('chanda-total-badge').innerHTML = 'Total: &#8377;' + fmt(total);
+
+  const byCollector = {};
+  chanda.forEach(c => {
+    const key = c.collector || 'Unknown';
+    if (!byCollector[key]) byCollector[key] = { total: 0, count: 0 };
+    byCollector[key].total += c.amount;
+    byCollector[key].count += 1;
+  });
+  const collectors = Object.entries(byCollector).sort((a, b) => b[1].total - a[1].total);
+  const byEl = document.getElementById('chanda-by-collector');
+  if (!collectors.length) {
+    byEl.innerHTML = '<div class="empty">No chanda recorded yet.</div>';
+  } else {
+    let rows = collectors.map(([name, v]) => `<tr>
+      <td>${esc(name)}</td>
+      <td>${v.count}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(v.total)}</span></td>
+    </tr>`).join('');
+    byEl.innerHTML = `<div class="table-wrap"><table>
+      <tr><th>Collector</th><th>Entries</th><th>Total</th></tr>
+      ${rows}
+    </table></div>`;
+  }
+
+  const byType = { 'Door-to-door': 0, 'Vehicle Collection': 0 };
+  chanda.forEach(c => { byType[c.source || 'Door-to-door'] = (byType[c.source || 'Door-to-door'] || 0) + c.amount; });
+  document.getElementById('chanda-by-type').innerHTML =
+    `<span class="badge badge-green">Door-to-door: &#8377;${fmt(byType['Door-to-door'] || 0)}</span> ` +
+    `<span class="badge badge-purple">Vehicle Collection: &#8377;${fmt(byType['Vehicle Collection'] || 0)}</span>`;
+
+  const byDate = {};
+  chanda.forEach(c => {
+    if (!byDate[c.date]) byDate[c.date] = { total: 0, count: 0 };
+    byDate[c.date].total += c.amount;
+    byDate[c.date].count += 1;
+  });
+  const dateEntries = Object.entries(byDate).sort((a, b) => parseDMY(b[0]) - parseDMY(a[0]));
+  const dateEl = document.getElementById('chanda-by-date');
+  if (!dateEntries.length) {
+    dateEl.innerHTML = '<div class="empty">No chanda recorded yet.</div>';
+  } else {
+    let rows = dateEntries.map(([date, v]) => `<tr>
+      <td>${date}</td>
+      <td>${v.count}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(v.total)}</span></td>
+    </tr>`).join('');
+    dateEl.innerHTML = `<div class="table-wrap"><table>
+      <tr><th>Date</th><th>Entries</th><th>Total</th></tr>
+      ${rows}
+    </table></div>`;
+  }
+
+  const list = toArr(CACHE.chanda).sort((a, b) => b._key < a._key ? -1 : 1);
+  const listEl = document.getElementById('chanda-list');
+  if (!list.length) { listEl.innerHTML = '<div class="empty">No chanda recorded yet.</div>'; return; }
+  let rows2 = '';
+  list.forEach(c => {
+    const delBtn = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteChanda('${c._key}')">Delete</button>` : '';
+    rows2 += `<tr>
+      <td>${c.date}</td>
+      <td>${esc(c.collector)}</td>
+      <td><span class="badge ${c.source === 'Vehicle Collection' ? 'badge-purple' : 'badge-green'}">${esc(c.source || 'Door-to-door')}</span></td>
+      <td>${esc(c.contributor || '—')}</td>
+      <td><span class="badge badge-green">&#8377;${fmt(c.amount)}</span></td>
+      <td>${esc(c.note || '—')}</td>
+      <td>${delBtn}</td>
+    </tr>`;
+  });
+  listEl.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Collector</th><th>Type</th><th>Contributor</th><th>Amount</th><th>Note</th><th></th></tr>
+    ${rows2}
+  </table></div>`;
+}
+
+async function addChanda() {
+  const collector   = document.getElementById('chanda-collector').value.trim();
+  const source      = document.getElementById('chanda-type').value;
+  const contributor = document.getElementById('chanda-contributor').value.trim();
+  const amount      = parseFloat(document.getElementById('chanda-amount').value);
+  const date        = document.getElementById('chanda-date').value;
+  const note        = document.getElementById('chanda-note').value.trim();
+
+  if (!collector)                                    return alert2('chanda-alert', 'error', 'Please enter the collector\'s name.');
+  if (!contributor && source !== 'Vehicle Collection') return alert2('chanda-alert', 'error', 'Please enter the contributor\'s name.');
+  if (!amount || amount <= 0)                         return alert2('chanda-alert', 'error', 'Please enter a valid amount.');
+  if (!date)                   return alert2('chanda-alert', 'error', 'Please select a date.');
+
+  setLoading('btn-chanda', true);
+  await mutate(data => {
+    data.chanda[genId()] = { collector, source, contributor, amount, note, date: fmtDate(new Date(date + 'T00:00:00')) };
+  }, 'chanda-alert');
+  setLoading('btn-chanda', false);
+
+  if (!busy) {
+    alert2('chanda-alert', 'success', '&#8377;' + fmt(amount) + ' chanda recorded.');
+    document.getElementById('chanda-contributor').value = '';
+    document.getElementById('chanda-amount').value = '';
+    document.getElementById('chanda-note').value = '';
+  }
+}
+
+async function deleteChanda(key) {
+  if (!confirm('Delete this chanda entry?')) return;
+  await mutate(data => { delete data.chanda[key]; });
+}
+
+// ─── Donations ────────────────────────────────────────────────────────────────
+function renderDonations() {
+  const donations = toArr(CACHE.donations).sort((a, b) => b._key < a._key ? -1 : 1);
+  const total = donations.reduce((s, d) => s + d.amount, 0);
+  document.getElementById('donation-total-badge').innerHTML = 'Total: &#8377;' + fmt(total) + ' (' + donations.length + ' donors)';
+
+  const el = document.getElementById('donation-list');
+  if (!donations.length) { el.innerHTML = '<div class="empty">No donations recorded yet.</div>'; return; }
+  let rows = '';
+  donations.forEach(d => {
+    const delBtn = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteDonation('${d._key}')">Delete</button>` : '';
+    rows += `<tr>
+      <td>${d.date}</td>
+      <td>${esc(d.donorName)}</td>
+      <td><span class="badge badge-purple">&#8377;${fmt(d.amount)}</span></td>
+      <td>${esc(d.note || '—')}</td>
+      <td>${delBtn}</td>
+    </tr>`;
+  });
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Donor</th><th>Amount</th><th>Purpose</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+async function addDonation() {
+  const donorName = document.getElementById('don-name').value.trim();
+  const amount    = parseFloat(document.getElementById('don-amount').value);
+  const date      = document.getElementById('don-date').value;
+  const note      = document.getElementById('don-note').value.trim();
+  const contact   = document.getElementById('don-contact').value.trim();
+
+  if (!donorName)              return alert2('donation-alert', 'error', 'Please enter donor name.');
+  if (!amount || amount <= 0)  return alert2('donation-alert', 'error', 'Please enter a valid amount.');
+  if (!date)                   return alert2('donation-alert', 'error', 'Please select a date.');
+  if (contact && !/^\d{10}$/.test(contact)) return alert2('donation-alert', 'error', 'Contact must be 10 digits.');
+
+  setLoading('btn-donation', true);
+  await mutate(data => {
+    data.donations[genId()] = { donorName, amount, note, contact: contact || '', date: fmtDate(new Date(date + 'T00:00:00')) };
+  }, 'donation-alert');
+  setLoading('btn-donation', false);
+
+  if (!busy) {
+    alert2('donation-alert', 'success', '&#8377;' + fmt(amount) + ' donation from ' + donorName + ' recorded.');
+    document.getElementById('don-name').value = '';
+    document.getElementById('don-amount').value = '';
+    document.getElementById('don-note').value = '';
+    document.getElementById('don-contact').value = '';
+  }
+}
+
+async function deleteDonation(key) {
+  if (!confirm('Delete this donation record?')) return;
+  await mutate(data => { delete data.donations[key]; });
+}
+
+// ─── Expenses ─────────────────────────────────────────────────────────────────
+function renderExpenses() {
+  const expenses = toArr(CACHE.expenses).sort((a, b) => b._key < a._key ? -1 : 1);
+  const total = expenses.reduce((s, e) => s + e.amount, 0);
+  document.getElementById('expense-total-badge').innerHTML = 'Total: &#8377;' + fmt(total);
+
+  const el = document.getElementById('expense-list');
+  if (!expenses.length) { el.innerHTML = '<div class="empty">No expenses recorded yet.</div>'; return; }
+  let rows = '';
+  expenses.forEach(e => {
+    const delBtn = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteExpense('${e._key}')">Delete</button>` : '';
+    rows += `<tr>
+      <td>${e.date}</td>
+      <td>${esc(e.desc)}</td>
+      <td><span class="badge badge-amber">${esc(e.category || '—')}</span></td>
+      <td><span class="badge badge-red">&#8377;${fmt(e.amount)}</span></td>
+      <td>${delBtn}</td>
+    </tr>`;
+  });
+  el.innerHTML = `<div class="table-wrap"><table>
+    <tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th></th></tr>
+    ${rows}
+  </table></div>`;
+}
+
+async function addExpense() {
+  const desc     = document.getElementById('exp-desc').value.trim();
+  const category = document.getElementById('exp-category').value;
+  const amount   = parseFloat(document.getElementById('exp-amount').value);
+  const date     = document.getElementById('exp-date').value;
+
+  if (!desc)                   return alert2('expense-alert', 'error', 'Please enter a description.');
+  if (!amount || amount <= 0)  return alert2('expense-alert', 'error', 'Please enter a valid amount.');
+  if (!date)                   return alert2('expense-alert', 'error', 'Please select a date.');
+
+  setLoading('btn-expense', true);
+  await mutate(data => {
+    data.expenses[genId()] = { desc, category, amount, date: fmtDate(new Date(date + 'T00:00:00')) };
+  }, 'expense-alert');
+  setLoading('btn-expense', false);
+
+  if (!busy) {
+    alert2('expense-alert', 'success', '&#8377;' + fmt(amount) + ' expense recorded.');
+    document.getElementById('exp-desc').value = '';
+    document.getElementById('exp-amount').value = '';
+  }
+}
+
+async function deleteExpense(key) {
+  if (!confirm('Delete this expense entry?')) return;
+  await mutate(data => { delete data.expenses[key]; });
+}
+
+// ─── Print summary ────────────────────────────────────────────────────────────
+function printSummary() {
+  const chanda    = toArr(CACHE.chanda);
+  const donations = toArr(CACHE.donations);
+  const expenses  = toArr(CACHE.expenses);
+
+  const totalChanda   = chanda.reduce((s, c) => s + c.amount, 0);
+  const totalDonation = donations.reduce((s, d) => s + d.amount, 0);
+  const totalIncome   = totalChanda + totalDonation;
+  const totalExpense  = expenses.reduce((s, e) => s + e.amount, 0);
+  const balance       = totalIncome - totalExpense;
+
+  const byCategory = {};
+  expenses.forEach(e => {
+    const key = e.category || 'Miscellaneous';
+    byCategory[key] = (byCategory[key] || 0) + e.amount;
+  });
+  const categoryRows = Object.entries(byCategory)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat, amt]) => `<tr><td>${esc(cat)}</td><td>&#8377;${fmt(amt)}</td></tr>`)
+    .join('');
+
+  const today = new Date();
+  const generatedOn = fmtDate(today);
+
+  document.getElementById('print-area').innerHTML = `
+    <div style="text-align:center;margin-bottom:24px;">
+      <h1 style="font-size:1.5rem;">Shyama Prasad Smriti Sangha</h1>
+      <h2 style="font-size:1.1rem;font-weight:600;margin-top:6px;">86th Year — Shree Shree Kali Pujo, 2026</h2>
+      <h3 style="font-size:1rem;font-weight:500;margin-top:10px;">Income &amp; Expenditure Statement</h3>
+      <p style="font-size:.85rem;color:#666;margin-top:6px;">Generated on ${generatedOn}</p>
+    </div>
+
+    <h3 style="margin-bottom:8px;">Income</h3>
+    <table>
+      <tr><th>Source</th><th>Amount</th></tr>
+      <tr><td>Chanda Collection (${chanda.length} entries)</td><td>&#8377;${fmt(totalChanda)}</td></tr>
+      <tr><td>Donations (${donations.length} donors)</td><td>&#8377;${fmt(totalDonation)}</td></tr>
+      <tr><td><strong>Total Income</strong></td><td><strong>&#8377;${fmt(totalIncome)}</strong></td></tr>
+    </table>
+
+    <h3 style="margin-bottom:8px;">Expenditure</h3>
+    <table>
+      <tr><th>Category</th><th>Amount</th></tr>
+      ${categoryRows || '<tr><td colspan="2">No expenses recorded.</td></tr>'}
+      <tr><td><strong>Total Expenditure</strong></td><td><strong>&#8377;${fmt(totalExpense)}</strong></td></tr>
+    </table>
+
+    <table>
+      <tr><td style="font-size:1.05rem;"><strong>${balance >= 0 ? 'Net Surplus' : 'Net Deficit'}</strong></td>
+          <td style="font-size:1.05rem;"><strong>&#8377;${fmt(Math.abs(balance))}</strong></td></tr>
+    </table>
+
+    <div style="display:flex;justify-content:space-between;margin-top:70px;font-size:.88rem;">
+      <div style="text-align:center;width:30%;">
+        <div style="border-top:1px solid #333;padding-top:6px;">Treasurer</div>
+      </div>
+      <div style="text-align:center;width:30%;">
+        <div style="border-top:1px solid #333;padding-top:6px;">Secretary</div>
+      </div>
+      <div style="text-align:center;width:30%;">
+        <div style="border-top:1px solid #333;padding-top:6px;">President</div>
+      </div>
+    </div>
+  `;
+
+  window.print();
+}
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+function toArr(obj) {
+  return Object.entries(obj || {}).map(([_key, val]) => ({ ...val, _key }));
+}
+function fmtDate(d) {
+  return String(d.getDate()).padStart(2, '0') + '/' +
+         String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function parseDMY(str) {
+  const [d, m, y] = str.split('/').map(Number);
+  return new Date(y, m - 1, d).getTime();
+}
+function fmt(n) { return Number(n).toLocaleString('en-IN'); }
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function alert2(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'alert alert-' + type;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = on;
+  if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+  btn.textContent = on ? 'Please wait...' : btn.dataset.label;
+}
+function setDefaultDates() {
+  const t = todayISO();
+  ['chanda-date', 'don-date', 'exp-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = t;
+  });
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+(async () => {
+  setDefaultDates();
+  syncBar('saving', 'Loading data...');
+  try {
+    await loadData();
+    syncBar('', '');
+  } catch (e) {
+    syncBar('error', 'Could not load data — check your connection and refresh.');
+  }
+  renderDashboard();
+})();
+
+// Auto-refresh every 5 minutes to conserve JSONBin free-tier quota
+setInterval(async () => {
+  try { await loadData(); refreshCurrentTab(); } catch (e) {}
+}, 300000);
+</script>
+</body>
+</html>

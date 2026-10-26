@@ -159,6 +159,13 @@ input:focus, select:focus {
   transition: background .15s;
 }
 .btn-sm-danger:hover { background: #7f1d1d; }
+.btn-sm-edit {
+  background: var(--saffron); color: #fff;
+  padding: 4px 11px; font-size: .74rem; border-radius: 7px;
+  border: none; cursor: pointer; font-family: inherit; font-weight: 600;
+  transition: background .15s; margin-right: 4px;
+}
+.btn-sm-edit:hover { background: #c46a10; }
 .btn-sm {
   background: var(--saffron); color: #fff;
   padding: 6px 13px; font-size: .76rem; border-radius: 7px;
@@ -385,10 +392,14 @@ footer {
         <input id="chanda-note" type="text" placeholder="Any remarks">
       </div>
       <button id="btn-chanda" class="btn btn-primary" onclick="addChanda()">Record Chanda</button>
+      <button id="chanda-cancel-edit" type="button" class="btn-logout" style="display:none;margin-top:8px;width:100%;padding:9px;" onclick="cancelChandaEdit()">Cancel Edit</button>
     </div>
     <div id="chanda-locked-note" class="card tab-note">🔒 Committee login required (top of page) to record new chanda entries.</div>
     <div class="card">
       <h2>All Chanda Entries</h2>
+      <div class="form-group" style="margin-bottom:14px;">
+        <input id="chanda-search" type="text" placeholder="🔍 Search by contributor name..." oninput="renderChanda()">
+      </div>
       <div id="chanda-list"></div>
     </div>
   </div>
@@ -419,10 +430,14 @@ footer {
         <input id="don-contact" type="tel" maxlength="10" placeholder="10-digit mobile number">
       </div>
       <button id="btn-donation" class="btn btn-primary" onclick="addDonation()">Record Donation</button>
+      <button id="donation-cancel-edit" type="button" class="btn-logout" style="display:none;margin-top:8px;width:100%;padding:9px;" onclick="cancelDonationEdit()">Cancel Edit</button>
     </div>
     <div id="donation-locked-note" class="card tab-note">🔒 Committee login required (top of page) to record new donations.</div>
     <div class="card">
       <h2>All Donations <span class="tab-total" id="donation-total-badge"></span></h2>
+      <div class="form-group" style="margin-bottom:14px;">
+        <input id="donation-search" type="text" placeholder="🔍 Search by donor name..." oninput="renderDonations()">
+      </div>
       <div id="donation-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>
     </div>
   </div>
@@ -490,6 +505,9 @@ let CACHE         = { chanda: {}, donations: {}, expenses: {} };
 let currentTab    = 'dashboard';
 let adminLoggedIn = false;
 let busy          = false;
+let editingChandaKey    = null;
+let editingDonationKey  = null;
+const ADMIN_SESSION_KEY = 'kalipujo2026_admin';
 
 // ─── JSONBin helpers ──────────────────────────────────────────────────────────
 async function loadData() {
@@ -576,6 +594,7 @@ function verifyAdmin() {
     adminLoggedIn = true;
     inp.value = '';
     document.getElementById('admin-alert').textContent = '';
+    try { localStorage.setItem(ADMIN_SESSION_KEY, '1'); } catch (e) {}
     updateAdminUI();
   } else {
     document.getElementById('admin-alert').textContent = 'Wrong password';
@@ -584,6 +603,7 @@ function verifyAdmin() {
 }
 function adminLogout() {
   adminLoggedIn = false;
+  try { localStorage.removeItem(ADMIN_SESSION_KEY); } catch (e) {}
   updateAdminUI();
 }
 function updateAdminUI() {
@@ -714,11 +734,15 @@ function renderChanda() {
     </table></div>`;
   }
 
-  const list = toArr(CACHE.chanda).sort((a, b) => b._key < a._key ? -1 : 1);
+  const search = document.getElementById('chanda-search').value.trim().toLowerCase();
+  const list = toArr(CACHE.chanda)
+    .filter(c => !search || (c.contributor || '').toLowerCase().includes(search))
+    .sort((a, b) => b._key < a._key ? -1 : 1);
   const listEl = document.getElementById('chanda-list');
-  if (!list.length) { listEl.innerHTML = '<div class="empty">No chanda recorded yet.</div>'; return; }
+  if (!list.length) { listEl.innerHTML = '<div class="empty">' + (search ? 'No contributors match your search.' : 'No chanda recorded yet.') + '</div>'; return; }
   let rows2 = '';
   list.forEach(c => {
+    const editBtn = adminLoggedIn ? `<button class="btn-sm-edit" onclick="editChanda('${c._key}')">✎ Edit</button>` : '';
     const delBtn = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteChanda('${c._key}')">Delete</button>` : '';
     rows2 += `<tr>
       <td>${c.date}</td>
@@ -727,7 +751,7 @@ function renderChanda() {
       <td>${esc(c.contributor || '—')}</td>
       <td><span class="badge badge-green">&#8377;${fmt(c.amount)}</span></td>
       <td>${esc(c.note || '—')}</td>
-      <td>${delBtn}</td>
+      <td>${editBtn}${delBtn}</td>
     </tr>`;
   });
   listEl.innerHTML = `<div class="table-wrap"><table>
@@ -749,18 +773,59 @@ async function addChanda() {
   if (!amount || amount <= 0)                         return alert2('chanda-alert', 'error', 'Please enter a valid amount.');
   if (!date)                   return alert2('chanda-alert', 'error', 'Please select a date.');
 
+  const key    = editingChandaKey || genId();
+  const isEdit = !!editingChandaKey;
+
   setLoading('btn-chanda', true);
   await mutate(data => {
-    data.chanda[genId()] = { collector, source, contributor, amount, note, date: fmtDate(new Date(date + 'T00:00:00')) };
+    data.chanda[key] = { collector, source, contributor, amount, note, date: fmtDate(new Date(date + 'T00:00:00')) };
   }, 'chanda-alert');
   setLoading('btn-chanda', false);
 
   if (!busy) {
-    alert2('chanda-alert', 'success', '&#8377;' + fmt(amount) + ' chanda recorded.');
-    document.getElementById('chanda-contributor').value = '';
-    document.getElementById('chanda-amount').value = '';
-    document.getElementById('chanda-note').value = '';
+    if (isEdit) {
+      alert2('chanda-alert', 'success', 'Chanda entry updated.');
+      cancelChandaEdit();
+    } else {
+      alert2('chanda-alert', 'success', '&#8377;' + fmt(amount) + ' chanda recorded.');
+      document.getElementById('chanda-contributor').value = '';
+      document.getElementById('chanda-amount').value = '';
+      document.getElementById('chanda-note').value = '';
+    }
   }
+}
+
+function editChanda(key) {
+  const c = CACHE.chanda[key];
+  if (!c) return;
+  editingChandaKey = key;
+  document.getElementById('chanda-collector').value = c.collector;
+  document.getElementById('chanda-type').value = c.source || 'Door-to-door';
+  updateChandaPlaceholder();
+  document.getElementById('chanda-contributor').value = c.contributor || '';
+  document.getElementById('chanda-amount').value = c.amount;
+  document.getElementById('chanda-date').value = dmyToISO(c.date);
+  document.getElementById('chanda-note').value = c.note || '';
+  const btn = document.getElementById('btn-chanda');
+  btn.dataset.label = 'Update Chanda';
+  btn.textContent = 'Update Chanda';
+  document.getElementById('chanda-cancel-edit').style.display = 'block';
+  document.getElementById('chanda-add-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelChandaEdit() {
+  editingChandaKey = null;
+  document.getElementById('chanda-collector').value = '';
+  document.getElementById('chanda-type').value = 'Door-to-door';
+  updateChandaPlaceholder();
+  document.getElementById('chanda-contributor').value = '';
+  document.getElementById('chanda-amount').value = '';
+  document.getElementById('chanda-date').value = todayISO();
+  document.getElementById('chanda-note').value = '';
+  const btn = document.getElementById('btn-chanda');
+  btn.dataset.label = 'Record Chanda';
+  btn.textContent = 'Record Chanda';
+  document.getElementById('chanda-cancel-edit').style.display = 'none';
 }
 
 async function deleteChanda(key) {
@@ -770,21 +835,25 @@ async function deleteChanda(key) {
 
 // ─── Donations ────────────────────────────────────────────────────────────────
 function renderDonations() {
-  const donations = toArr(CACHE.donations).sort((a, b) => b._key < a._key ? -1 : 1);
-  const total = donations.reduce((s, d) => s + d.amount, 0);
-  document.getElementById('donation-total-badge').innerHTML = 'Total: &#8377;' + fmt(total) + ' (' + donations.length + ' donors)';
+  const all = toArr(CACHE.donations).sort((a, b) => b._key < a._key ? -1 : 1);
+  const total = all.reduce((s, d) => s + d.amount, 0);
+  document.getElementById('donation-total-badge').innerHTML = 'Total: &#8377;' + fmt(total) + ' (' + all.length + ' donors)';
+
+  const search = document.getElementById('donation-search').value.trim().toLowerCase();
+  const donations = all.filter(d => !search || (d.donorName || '').toLowerCase().includes(search));
 
   const el = document.getElementById('donation-list');
-  if (!donations.length) { el.innerHTML = '<div class="empty">No donations recorded yet.</div>'; return; }
+  if (!donations.length) { el.innerHTML = '<div class="empty">' + (search ? 'No donors match your search.' : 'No donations recorded yet.') + '</div>'; return; }
   let rows = '';
   donations.forEach(d => {
+    const editBtn = adminLoggedIn ? `<button class="btn-sm-edit" onclick="editDonation('${d._key}')">✎ Edit</button>` : '';
     const delBtn = adminLoggedIn ? `<button class="btn-sm-danger" onclick="deleteDonation('${d._key}')">Delete</button>` : '';
     rows += `<tr>
       <td>${d.date}</td>
       <td>${esc(d.donorName)}</td>
       <td><span class="badge badge-purple">&#8377;${fmt(d.amount)}</span></td>
       <td>${esc(d.note || '—')}</td>
-      <td>${delBtn}</td>
+      <td>${editBtn}${delBtn}</td>
     </tr>`;
   });
   el.innerHTML = `<div class="table-wrap"><table>
@@ -805,19 +874,56 @@ async function addDonation() {
   if (!date)                   return alert2('donation-alert', 'error', 'Please select a date.');
   if (contact && !/^\d{10}$/.test(contact)) return alert2('donation-alert', 'error', 'Contact must be 10 digits.');
 
+  const key    = editingDonationKey || genId();
+  const isEdit = !!editingDonationKey;
+
   setLoading('btn-donation', true);
   await mutate(data => {
-    data.donations[genId()] = { donorName, amount, note, contact: contact || '', date: fmtDate(new Date(date + 'T00:00:00')) };
+    data.donations[key] = { donorName, amount, note, contact: contact || '', date: fmtDate(new Date(date + 'T00:00:00')) };
   }, 'donation-alert');
   setLoading('btn-donation', false);
 
   if (!busy) {
-    alert2('donation-alert', 'success', '&#8377;' + fmt(amount) + ' donation from ' + donorName + ' recorded.');
-    document.getElementById('don-name').value = '';
-    document.getElementById('don-amount').value = '';
-    document.getElementById('don-note').value = '';
-    document.getElementById('don-contact').value = '';
+    if (isEdit) {
+      alert2('donation-alert', 'success', 'Donation updated.');
+      cancelDonationEdit();
+    } else {
+      alert2('donation-alert', 'success', '&#8377;' + fmt(amount) + ' donation from ' + donorName + ' recorded.');
+      document.getElementById('don-name').value = '';
+      document.getElementById('don-amount').value = '';
+      document.getElementById('don-note').value = '';
+      document.getElementById('don-contact').value = '';
+    }
   }
+}
+
+function editDonation(key) {
+  const d = CACHE.donations[key];
+  if (!d) return;
+  editingDonationKey = key;
+  document.getElementById('don-name').value = d.donorName;
+  document.getElementById('don-amount').value = d.amount;
+  document.getElementById('don-date').value = dmyToISO(d.date);
+  document.getElementById('don-note').value = d.note || '';
+  document.getElementById('don-contact').value = d.contact || '';
+  const btn = document.getElementById('btn-donation');
+  btn.dataset.label = 'Update Donation';
+  btn.textContent = 'Update Donation';
+  document.getElementById('donation-cancel-edit').style.display = 'block';
+  document.getElementById('donation-add-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelDonationEdit() {
+  editingDonationKey = null;
+  document.getElementById('don-name').value = '';
+  document.getElementById('don-amount').value = '';
+  document.getElementById('don-date').value = todayISO();
+  document.getElementById('don-note').value = '';
+  document.getElementById('don-contact').value = '';
+  const btn = document.getElementById('btn-donation');
+  btn.dataset.label = 'Record Donation';
+  btn.textContent = 'Record Donation';
+  document.getElementById('donation-cancel-edit').style.display = 'none';
 }
 
 async function deleteDonation(key) {
@@ -963,6 +1069,10 @@ function parseDMY(str) {
   const [d, m, y] = str.split('/').map(Number);
   return new Date(y, m - 1, d).getTime();
 }
+function dmyToISO(str) {
+  const [d, m, y] = str.split('/');
+  return y + '-' + m + '-' + d;
+}
 function fmt(n) { return Number(n).toLocaleString('en-IN'); }
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -993,6 +1103,12 @@ function setDefaultDates() {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 (async () => {
   setDefaultDates();
+  try {
+    if (localStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+      adminLoggedIn = true;
+      updateAdminUI();
+    }
+  } catch (e) {}
   syncBar('saving', 'Loading data...');
   try {
     await loadData();

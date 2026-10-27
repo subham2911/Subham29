@@ -340,7 +340,7 @@ footer {
       <div class="stat-card stat-balance">
         <div class="s-label" id="stat-balance-label">Net Balance</div>
         <div class="s-value" id="stat-balance">&#8377;0</div>
-        <div class="s-sub">Income − Expenses</div>
+        <div class="s-sub">Income − Expenses − Advances</div>
       </div>
       <div class="stat-card stat-advance">
         <div class="s-label">Outstanding Advances</div>
@@ -500,7 +500,7 @@ footer {
       <h2>Record Advance</h2>
       <div id="advance-alert" class="alert"></div>
       <div class="form-group">
-        <label>Lender (Member) Name</label>
+        <label>Lender / Source</label>
         <input id="adv-lender" type="text" placeholder="Who paid out of pocket?">
       </div>
       <div class="form-group">
@@ -719,7 +719,12 @@ function renderDashboard() {
   const totalChanda   = chanda.reduce((s, c) => s + c.amount, 0);
   const totalDonation = donations.reduce((s, d) => s + d.amount, 0);
   const totalExpense  = expenses.reduce((s, e) => s + e.amount, 0);
-  const balance       = totalChanda + totalDonation - totalExpense;
+
+  // An advance is money already spent on the pujo (just fronted by someone else),
+  // so it counts as real cost in the balance — "outstanding" only tracks who's still owed.
+  const totalAdvanceAll          = advances.reduce((s, a) => s + a.amount, 0);
+  const totalCost                = totalExpense + totalAdvanceAll;
+  const balance                  = totalChanda + totalDonation - totalCost;
 
   const outstandingAdvances      = advances.filter(a => !a.repaid);
   const totalOutstandingAdvance  = outstandingAdvances.reduce((s, a) => s + a.amount, 0);
@@ -749,10 +754,13 @@ function renderDashboard() {
 
   let rows = '';
   txns.forEach(tx => {
-    const sign  = (tx.type === 'expense' || tx.type === 'advance-repaid') ? '−' : '+';
+    // Advance-repaid just settles a debt already counted as cost above — show it
+    // with no +/- sign so it reads as informational, not a second expense.
+    const sign  = tx.type === 'advance-repaid' ? '' : (tx.type === 'expense' || tx.type === 'advance') ? '−' : '+';
     const badge = tx.type === 'expense' ? 'badge-red'
       : tx.type === 'donation' ? 'badge-purple'
-      : (tx.type === 'advance' || tx.type === 'advance-repaid') ? 'badge-amber'
+      : tx.type === 'advance' ? 'badge-amber'
+      : tx.type === 'advance-repaid' ? 'badge-green'
       : 'badge-green';
     rows += `<tr>
       <td>${tx.date}</td>
@@ -1202,13 +1210,21 @@ function printSummary() {
   const totalDonation = donations.reduce((s, d) => s + d.amount, 0);
   const totalIncome   = totalChanda + totalDonation;
   const totalExpense  = expenses.reduce((s, e) => s + e.amount, 0);
-  const balance       = totalIncome - totalExpense;
+  const totalAdvanceAll = advances.reduce((s, a) => s + a.amount, 0);
+  const totalCost       = totalExpense + totalAdvanceAll;
+  const balance          = totalIncome - totalCost;
   const outstandingAdvance = advances.filter(a => !a.repaid).reduce((s, a) => s + a.amount, 0);
 
+  // Expenditure by category combines direct Expenses and advance-funded spending —
+  // an advance is money already spent on the pujo, just fronted by someone else.
   const byCategory = {};
   expenses.forEach(e => {
     const key = e.category || 'Miscellaneous';
     byCategory[key] = (byCategory[key] || 0) + e.amount;
+  });
+  advances.forEach(a => {
+    const key = a.category || 'Miscellaneous';
+    byCategory[key] = (byCategory[key] || 0) + a.amount;
   });
   const categoryRows = Object.entries(byCategory)
     .sort((a, b) => b[1] - a[1])
@@ -1238,7 +1254,8 @@ function printSummary() {
     <table>
       <tr><th>Category</th><th>Amount</th></tr>
       ${categoryRows || '<tr><td colspan="2">No expenses recorded.</td></tr>'}
-      <tr><td><strong>Total Expenditure</strong></td><td><strong>&#8377;${fmt(totalExpense)}</strong></td></tr>
+      ${totalAdvanceAll > 0 ? `<tr><td>— of which paid via member/fund advances</td><td>&#8377;${fmt(totalAdvanceAll)}</td></tr>` : ''}
+      <tr><td><strong>Total Expenditure</strong></td><td><strong>&#8377;${fmt(totalCost)}</strong></td></tr>
     </table>
 
     <table>
@@ -1248,11 +1265,11 @@ function printSummary() {
 
     ${outstandingAdvance > 0 ? `
     <h3 style="margin-bottom:8px;">Advances Payable (Outstanding)</h3>
+    <p style="font-size:.82rem;color:#555;margin-bottom:8px;">Already included in Expenditure above — this just lists who the club still needs to repay.</p>
     <table>
       <tr><th>Lender</th><th>Category</th><th>Amount</th></tr>
       ${advances.filter(a => !a.repaid).map(a => `<tr><td>${esc(a.lender)}</td><td>${esc(a.category || '—')}</td><td>&#8377;${fmt(a.amount)}</td></tr>`).join('')}
       <tr><td colspan="2"><strong>Total Outstanding Advances</strong></td><td><strong>&#8377;${fmt(outstandingAdvance)}</strong></td></tr>
-      <tr><td colspan="2"><strong>Net Position After Repayment</strong></td><td><strong>&#8377;${fmt(balance - outstandingAdvance)}</strong></td></tr>
     </table>
     ` : ''}
 
